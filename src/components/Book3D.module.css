@@ -1,0 +1,487 @@
+/* ============================================
+   3D Book Component - CSS Module
+   Based on Tympanus Codrops 3D Book Showcase
+   ============================================ */
+
+/* Book dimensions as CSS custom properties (configurable via inline styles) */
+.bookContainer {
+  perspective: 5000px;
+  perspective-origin: 50% 50%;
+  pointer-events: none;
+}
+
+.book {
+  --book-width: 360px;
+  --book-height: 540px;
+  --book-depth: 72px;
+  --spine-color: #333;
+  --page-color: #f0ece4;
+
+  position: relative;
+  width: var(--book-width);
+  height: var(--book-height);
+  transform-style: preserve-3d;
+  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* ---- Default state: spine facing viewer ---- */
+.bookDefault {
+  transform: rotateY(90deg);
+}
+
+/* ---- Cover visible state (first click) ---- */
+.bookCoverVisible {
+  transform: rotateY(0deg) scale(1.05);
+  will-change: transform;
+}
+
+/* ---- Open state (second click): front cover flips open ---- */
+.bookOpen {
+  transform: rotateY(0deg) translateZ(100px);
+  will-change: transform;
+}
+
+.bookOpen .front {
+  transform: translateZ(calc(var(--book-depth) / 2)) rotateY(-160deg);
+}
+
+.bookOpen .coverBack {
+  overflow: hidden;
+}
+
+.bookOpen .back {
+  transform: translateZ(calc(var(--book-depth) / 2 - 2px));
+}
+
+.bookOpen .page {
+  width: calc(var(--book-width) - 4px);
+  height: calc(var(--book-height) - 8px);
+  top: 4px;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   Book Faces
+   ============================================ */
+
+/* Front cover container - hinges from spine (left edge) */
+.front {
+  position: absolute;
+  width: var(--book-width);
+  height: var(--book-height);
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  transform: translateZ(calc(var(--book-depth) / 2));
+  z-index: 10;
+  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Front cover - outer face */
+.cover {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 0 3px 3px 0;
+  overflow: hidden;
+  background-color: var(--spine-color);
+  box-shadow: inset 4px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Spine-edge line on cover */
+.cover::before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 0;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Spine shadow + glossy highlight on cover */
+.cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.06) 8px,
+    transparent 18px,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Front cover - inner face (title page, revealed when book opens) */
+.coverBack {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+  background: var(--spine-color);
+  border-radius: 3px 0 0 3px;
+  overflow: hidden;
+  padding: 4px 0 4px 4px;
+}
+
+/* Interior page (role play setup, visible when book is open) */
+.page {
+  position: absolute;
+  width: var(--book-width);
+  height: var(--book-height);
+  top: 0;
+  left: 0;
+  transform: translateZ(calc(var(--book-depth) / 2));
+  background: #f0ece4;
+  border-radius: 0 2px 2px 0;
+  overflow: hidden;
+  transition: box-shadow 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Back cover */
+.back {
+  position: absolute;
+  width: var(--book-width);
+  height: var(--book-height);
+  transform: translateZ(calc(var(--book-depth) / -2));
+  background-color: var(--spine-color);
+  border-radius: 0 3px 3px 0;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  line-height: 1.5;
+  overflow: hidden;
+  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Spine (left side) */
+.spine {
+  position: absolute;
+  width: var(--book-depth);
+  height: var(--book-height);
+  left: 0;
+  top: 0;
+  transform: translateX(calc(var(--book-depth) / -2)) rotateY(-90deg);
+  background: var(--spine-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Spine gradient overlay for realism */
+.spine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(0, 0, 0, 0.1) 80%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  pointer-events: none;
+}
+
+.spineText {
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  white-space: nowrap;
+  max-height: calc(var(--book-height) - 40px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Page edges (right side) */
+.pages {
+  position: absolute;
+  width: var(--book-depth);
+  height: calc(var(--book-height) - 6px);
+  top: 3px;
+  left: 0;
+  transform: translateX(calc(var(--book-width) - var(--book-depth) / 2)) rotateY(90deg);
+  background: repeating-linear-gradient(
+    to right,
+    #ededed 0px,
+    #fff 1px,
+    #ededed 2px
+  );
+}
+
+/* ============================================
+   Paper Texture Overlay
+   ============================================ */
+
+.paperTexture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Left page (coverBack) gets right-edge spine shadow */
+.coverBack .paperTexture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    270deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.04) 68%,
+    rgba(0, 0, 0, 0.24) 99%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  mix-blend-mode: color-burn;
+}
+
+/* Right page gets left-edge spine shadow */
+.page .paperTexture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    270deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.24) 1%,
+    rgba(0, 0, 0, 0.04) 32%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mix-blend-mode: color-burn;
+}
+
+/* ============================================
+   Title Page (left page / coverBack)
+   ============================================ */
+
+.titlePageContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  height: 100%;
+  padding: 32px 28px;
+  box-sizing: border-box;
+  background: #f0ece4;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+}
+
+.titlePageTitle {
+  font-family: var(--font-libre-baskerville), 'Libre Baskerville', serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #2c2420;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.titlePageAuthor {
+  font-family: var(--font-libre-baskerville), 'Libre Baskerville', serif;
+  text-align: center;
+  color: #2c2420;
+  line-height: 1.4;
+}
+
+.titlePageBy {
+  font-size: 12px;
+  color: #6b5e53;
+}
+
+.titlePageAuthorName {
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #2c2420;
+}
+
+.titlePageDesc {
+  font-family: var(--font-libre-baskerville), 'Libre Baskerville', serif;
+  font-size: 13px;
+  font-style: italic;
+  color: #5a4f46;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.titlePageChapters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.titlePageChaptersLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: #6b5e53;
+  margin-bottom: 4px;
+}
+
+.titlePageChapterRow {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.titlePageChapterLabel {
+  font-family: var(--font-libre-baskerville), 'Libre Baskerville', serif;
+  font-size: 10px;
+  color: #9a8d82;
+  white-space: nowrap;
+  min-width: 44px;
+}
+
+.titlePageChapterName {
+  font-family: var(--font-libre-baskerville), 'Libre Baskerville', serif;
+  font-size: 14px;
+  color: #2c2420;
+}
+
+.titlePageMeta {
+  font-family: var(--font-libre-baskerville), 'Libre Baskerville', serif;
+  font-size: 10px;
+  color: #9a8d82;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  margin-top: auto;
+}
+
+/* ============================================
+   Role Play Setup (right page)
+   ============================================ */
+
+.setupContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 28px;
+  width: 100%;
+  height: 100%;
+  padding: 32px 28px;
+  box-sizing: border-box;
+}
+
+.setupHeader {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b5e53;
+  text-align: left;
+  letter-spacing: 1.5px;
+}
+
+.setupControls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+}
+
+.selectorGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.selectorLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: #9a8d82;
+  letter-spacing: 1px;
+}
+
+.selectorPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 32px;
+  border: 1px solid #d5d0ca;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.selectorValue {
+  flex: 1;
+  font-family: var(--font-libre-baskerville), 'Libre Baskerville', serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #2c2420;
+  text-align: center;
+}
+
+.arrowButton {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #c5c0ba;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b5e53;
+  padding: 0;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.arrowButton:hover {
+  border-color: #8a7e73;
+  color: #2c2420;
+}
+
+.diveInButton {
+  width: 100%;
+  height: 52px;
+  border-radius: 52px;
+  border: none;
+  background: #4A7CFF;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: auto;
+}
+
+.diveInButton:hover {
+  background: #3A6AEE;
+}
+
+

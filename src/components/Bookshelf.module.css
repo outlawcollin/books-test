@@ -1,0 +1,236 @@
+/* ============================================
+   Outer Wrapper (scroll control)
+   ============================================ */
+
+.outerWrapper {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100dvh;
+}
+
+.outerWrapperOpen {
+  overflow-y: auto;
+  height: auto;
+  min-height: 100dvh;
+}
+
+/* ============================================
+   Bookshelf Container
+   ============================================ */
+
+.shelfWrapper {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+/* Background blur orb (from Figma design) */
+.bgBlur {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 750px;
+  background: radial-gradient(ellipse at center, rgba(171, 245, 237, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shelf {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  height: 640px;
+  left: 50%;
+  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Spine book slot */
+.bookSlot {
+  flex: 0 0 auto;
+  width: 80px;
+  height: 540px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  transition: width 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Active book slot — wide enough for the cover */
+.bookSlotActive {
+  flex: 0 0 auto;
+  width: 400px;
+  height: 540px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  transition: width 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Open book slot — fits flipped cover + page */
+.bookSlotOpen {
+  flex: 0 0 auto;
+  width: 720px;
+  height: 540px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: visible;
+  transition: width 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ============================================
+   Back Arrow (close book)
+   ============================================ */
+
+.backArrow {
+  position: absolute;
+  top: calc(50% - 300px);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.backArrow:hover {
+  border-color: #999;
+  color: #222;
+}
+
+.backArrowVisible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================
+   Community Rewrites Section
+   ============================================ */
+
+.communitySection {
+  width: 100%;
+  padding: 64px 44px 80px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.communitySectionVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.communityHeading {
+  font-family: var(--font-libre-baskerville), 'Libre Baskerville', serif;
+  font-size: 32px;
+  font-weight: 400;
+  color: #131313;
+  text-align: center;
+  margin: 0 0 8px;
+}
+
+.communitySubheading {
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+  margin: 0 0 48px;
+}
+
+.rewriteGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.createCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px 20px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: background 0.2s;
+  min-height: 320px;
+}
+
+.createCard:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.createCardIcon {
+  color: #888;
+}
+
+.createCardLabel {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+}
+
+.rewriteCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.rewriteCardCover {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px;
+  text-align: center;
+}
+
+.rewriteCardTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.2;
+}
+
+.rewriteCardAuthor {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.rewriteCardPremise {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #444;
+  margin: 0;
+  text-align: center;
+}
