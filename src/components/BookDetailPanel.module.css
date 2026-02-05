@@ -1,0 +1,234 @@
+.panel {
+  display: flex;
+  height: 100%;
+  gap: 0;
+  font-family: var(--font-libre-baskerville), serif;
+  color: #3e2733;
+  overflow: hidden;
+}
+
+/* Role Play Setup Column */
+.setupColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 52px;
+  overflow-y: auto;
+  justify-content: center;
+}
+
+/* Sections */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.sectionSubtitle {
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.6;
+  margin: 0;
+}
+
+/* Badges */
+.badgeDark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background: #3e2733;
+  color: white;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 4px;
+  align-self: flex-start;
+}
+
+.badgeAccent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background: #652e1f;
+  color: white;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 4px;
+  align-self: center;
+}
+
+/* Character Picker */
+.characterRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  overflow-x: auto;
+}
+
+.character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.characterCircle {
+  width: 72px;
+  height: 72px;
+  border-radius: 100px;
+  background: #3e2733;
+  box-shadow: 0px 4px 32px rgba(62, 39, 51, 0.04);
+}
+
+.characterCircleAdd {
+  width: 72px;
+  height: 72px;
+  border-radius: 100px;
+  border: 1px solid rgba(62, 39, 51, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #3e2733;
+  opacity: 0.7;
+  box-shadow: 0px 4px 32px rgba(62, 39, 51, 0.04);
+}
+
+.characterDivider {
+  width: 1px;
+  height: 72px;
+  background: rgba(62, 39, 51, 0.15);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.characterName {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Cards */
+.cardRow {
+  display: flex;
+  gap: 4px;
+}
+
+.cardStack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 24px;
+  border: 1px solid rgba(62, 39, 51, 0.42);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.card:hover {
+  background: rgba(62, 39, 51, 0.04);
+}
+
+.cardTitle {
+  font-size: 16px;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.cardSubtitle {
+  font-size: 12px;
+  opacity: 0.6;
+  margin: 0;
+}
+
+/* CTA Button */
+.ctaButton {
+  width: 100%;
+  padding: 16px 20px;
+  background: #c9ae94;
+  color: white;
+  border: none;
+  border-radius: 44px;
+  font-family: var(--font-libre-baskerville), sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.ctaButton:hover {
+  opacity: 0.9;
+}
+
+/* Vertical Divider */
+.divider {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(62, 39, 51, 0.12);
+  flex-shrink: 0;
+}
+
+/* Community Rewrites Column */
+.rewritesColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  max-width: 224px;
+  min-width: 180px;
+  padding: 32px 16px;
+  overflow-y: auto;
+}
+
+.rewritesList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+}
+
+.rewriteCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 172px;
+  cursor: pointer;
+}
+
+.rewriteCover {
+  width: 124px;
+  height: 164px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0px 4px 32px rgba(62, 39, 51, 0.04);
+}
+
+.rewritePremise {
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  margin: 0;
+  color: #131313;
+}

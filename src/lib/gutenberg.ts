@@ -1,4 +1,4 @@
-import type { BookData } from "@/components/Bookshelf";
+import type { BookData } from "@/lib/types";
 
 interface GutenbergAuthor {
   name: string;
@@ -53,11 +53,12 @@ export async function fetchGutenbergBooks(count: number): Promise<BookData[]> {
       ? flipAuthorName(book.authors[0].name)
       : "Unknown";
 
-    // Full-res cover from /files/ path; medium from API as fallback
+    // Proxy covers through /api/cover — tries full-res first, falls back to medium-res
     const fullRes = `https://www.gutenberg.org/files/${book.id}/${book.id}-h/images/cover.jpg`;
     const mediumRes = book.formats["image/jpeg"] || undefined;
-    const coverImage = fullRes;
-    const coverImageFallback = mediumRes;
+    const coverImage = mediumRes
+      ? `/api/cover?url=${encodeURIComponent(fullRes)}&fallback=${encodeURIComponent(mediumRes)}`
+      : `/api/cover?url=${encodeURIComponent(fullRes)}`;
     const spineColor = SPINE_COLORS[i % SPINE_COLORS.length];
 
     // Derive a rough published year from author death year
@@ -79,7 +80,6 @@ export async function fetchGutenbergBooks(count: number): Promise<BookData[]> {
       title: book.title,
       author,
       coverImage,
-      coverImageFallback,
       spineColor,
       description,
       publishedYear,

@@ -1,4 +1,4 @@
-import Bookshelf from "@/components/Bookshelf";
+import BookshelfLoader from "@/components/BookshelfLoader";
 import { fetchGutenbergBooks } from "@/lib/gutenberg";
 
 export default async function Home() {
@@ -7,12 +7,12 @@ export default async function Home() {
   return (
     <main
       style={{
-        minHeight: "100vh",
-        background: "#ffffff",
-        overflowX: "hidden",
+        height: "100dvh",
+        background: "#fbf9f7",
+        overflow: "hidden",
       }}
     >
-      <Bookshelf books={books} />
+      <BookshelfLoader books={books} />
     </main>
   );
 }
