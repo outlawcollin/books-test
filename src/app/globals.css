@@ -1,17 +1,121 @@
 @import "tailwindcss";
 
+/* ─── Color Tokens (Character.ai Brand Guidelines v1.0) ──────────────────── */
+/* Source: Figma Brand Guidelines — pages 126 (Digital Palette), 129 (Secondary) */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary / Digital Palette */
+  --color-pure-white:           #ffffff;
+  --color-pure-white-digital-1: #f2f2f2; /* 5% black overlay  */
+  --color-pure-white-digital-2: #d9d9d9; /* 15% black overlay */
+  --color-pure-white-digital-3: #bfbfbf; /* 25% black overlay */
+
+  --color-off-white:            #e5dfeb;
+  --color-off-white-digital-1:  #dad4df; /* 5% black overlay  */
+  --color-off-white-digital-2:  #c3bec8; /* 15% black overlay */
+  --color-off-white-digital-3:  #aca7b0; /* 25% black overlay */
+
+  --color-pure-black:           #000000;
+  --color-pure-black-digital-1: #0d0d0d; /* 5% white overlay  */
+  --color-pure-black-digital-2: #262626; /* 15% white overlay */
+  --color-pure-black-digital-3: #404040; /* 25% white overlay */
+
+  --color-default-blue:         #195eff;
+
+  /* Secondary Palette */
+  --color-butter:     #fff59e;
+  --color-lime:       #aed900;
+  --color-sky:        #abf5ed;
+  --color-lavender:   #df91f2;
+  --color-rose:       #ffadd2;
+
+  --color-gold:       #ffe600;
+  --color-emerald:    #00d973;
+  --color-cyan:       #00d9d9;
+  --color-violet:     #ae00d9;
+  --color-hot-pink:   #ff4dc9;
+
+  --color-amber:      #f28500;
+  --color-dark-sage:  #65a98f;
+  --color-cornflower: #7db4ff;
+  --color-plum:       #6b2e63;
+  --color-magenta:    #d90082;
+
+  --color-crimson:    #d90000;
+  --color-forest:     #2b9247;
+  --color-ink:        #3e2733;
+  --color-espresso:   #652e1f;
+
+  /* App-specific */
+  --color-book-background: #f4f0e9;
+  --color-cta:             #c9ae94;
+
+  /* Semantic aliases */
+  --background: var(--color-book-background);
+  --foreground: var(--color-pure-black);
 }
+
+/* ─── Tailwind Theme Registration ─────────────────────────────────────────── */
+/* Maps CSS vars to Tailwind utilities: bg-*, text-*, border-*, etc. */
 
 @theme inline {
+  /* Primary */
+  --color-pure-white:           var(--color-pure-white);
+  --color-pure-white-digital-1: var(--color-pure-white-digital-1);
+  --color-pure-white-digital-2: var(--color-pure-white-digital-2);
+  --color-pure-white-digital-3: var(--color-pure-white-digital-3);
+
+  --color-off-white:            var(--color-off-white);
+  --color-off-white-digital-1:  var(--color-off-white-digital-1);
+  --color-off-white-digital-2:  var(--color-off-white-digital-2);
+  --color-off-white-digital-3:  var(--color-off-white-digital-3);
+
+  --color-pure-black:           var(--color-pure-black);
+  --color-pure-black-digital-1: var(--color-pure-black-digital-1);
+  --color-pure-black-digital-2: var(--color-pure-black-digital-2);
+  --color-pure-black-digital-3: var(--color-pure-black-digital-3);
+
+  --color-default-blue:         var(--color-default-blue);
+
+  /* Secondary */
+  --color-butter:     var(--color-butter);
+  --color-lime:       var(--color-lime);
+  --color-sky:        var(--color-sky);
+  --color-lavender:   var(--color-lavender);
+  --color-rose:       var(--color-rose);
+
+  --color-gold:       var(--color-gold);
+  --color-emerald:    var(--color-emerald);
+  --color-cyan:       var(--color-cyan);
+  --color-violet:     var(--color-violet);
+  --color-hot-pink:   var(--color-hot-pink);
+
+  --color-amber:      var(--color-amber);
+  --color-dark-sage:  var(--color-dark-sage);
+  --color-cornflower: var(--color-cornflower);
+  --color-plum:       var(--color-plum);
+  --color-magenta:    var(--color-magenta);
+
+  --color-crimson:    var(--color-crimson);
+  --color-forest:     var(--color-forest);
+  --color-ink:        var(--color-ink);
+  --color-espresso:   var(--color-espresso);
+
+  /* App-specific */
+  --color-book-background: var(--color-book-background);
+  --color-cta:             var(--color-cta);
+
+  /* Semantic */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Fonts */
+  --font-sans: var(--font-manrope);
+  --font-serif: var(--font-libre-baskerville);
+  --font-display: var(--font-averia);
 }
 
+/* ─── Base Reset ──────────────────────────────────────────────────────────── */
 
 html,
 body {
@@ -21,7 +125,18 @@ body {
   overflow: hidden;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), sans-serif;
+}
+
+/* ─── Shimmer line animation (upload loading) ───────────────────────────── */
+
+@keyframes shimmer-line {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Hide scrollbars from Drei ScrollControls */
@@ -33,3 +148,13 @@ body {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+/* Hide below lg (1024px) — uses MQ3 syntax for Safari compatibility
+   (Tailwind's max-lg: compiles to MQ4 `not (min-width)` which Safari
+   doesn't handle correctly inside @layer) */
+@media (max-width: 1023px) {
+  .hide-below-lg {
+    display: none !important;
+  }
+}
+

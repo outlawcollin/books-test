@@ -33,10 +33,10 @@ export default function BookInterior({
         style={{
           width: "100%",
           height: "100%",
-          background: "#f5f0e1",
+          background: "var(--color-book-background)",
           borderRadius: 4,
           padding: 20,
-          fontFamily: "'Libre Baskerville', serif",
+          fontFamily: "var(--font-libre-baskerville), serif",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
@@ -59,7 +59,7 @@ function TitlePage({ book }: { book: BookData }) {
         justifyContent: "center",
         textAlign: "center",
         gap: 12,
-        color: "#2a2a2a",
+        color: "var(--color-ink)",
       }}
     >
       <div
@@ -196,8 +196,8 @@ function RolePlaySetup({ characters }: { characters?: string[] }) {
         style={{
           width: "100%",
           padding: "8px 0",
-          background: "#2a2a2a",
-          color: "#fff",
+          background: "var(--color-ink)",
+          color: "var(--color-pure-white)",
           border: "none",
           borderRadius: 6,
           fontSize: 12,

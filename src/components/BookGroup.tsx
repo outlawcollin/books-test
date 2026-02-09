@@ -15,7 +15,7 @@ interface BookGroupProps {
 
 type BookState = "spine" | "cover";
 
-const BOOK_SPACING = 0.85;
+const BOOK_SPACING = 0.65;
 const COVER_SPREAD = 0.8;
 const LERP_SPEED = 0.08;
 const ENTER_LERP_SPEED = 0.07;
@@ -74,6 +74,8 @@ export default function BookGroup({ books, onSelectBook, selectedBook }: BookGro
           const exitX = i < selectedIndex ? -OFFSCREEN_X : OFFSCREEN_X;
           ref.position.x = MathUtils.lerp(ref.position.x, exitX, 0.08);
           ref.traverse((child) => {
+            // Skip troika text meshes — SDF shader looks wrong at partial opacity
+            if ("text" in child) return;
             const mesh = child as { isMesh?: boolean; material?: { transparent: boolean; opacity: number } };
             if (mesh.isMesh && mesh.material) {
               mesh.material.transparent = true;
@@ -109,6 +111,8 @@ export default function BookGroup({ books, onSelectBook, selectedBook }: BookGro
 
         // Restore opacity for books returning from detail mode
         ref.traverse((child) => {
+          // Skip troika text meshes — SDF shader looks wrong at partial opacity
+          if ("text" in child) return;
           const mesh = child as { isMesh?: boolean; material?: { transparent: boolean; opacity: number } };
           if (mesh.isMesh && mesh.material && mesh.material.opacity < 1) {
             mesh.material.opacity = MathUtils.lerp(mesh.material.opacity, 1, 0.1);

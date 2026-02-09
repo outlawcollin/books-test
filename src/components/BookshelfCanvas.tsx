@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor, ContactShadows, Bvh } from "@react-three/drei";
 import BookshelfScene from "./BookshelfScene";
 import type { BookData } from "@/lib/types";
+import { primary } from "@/lib/tokens";
 
 interface BookshelfCanvasProps {
   books: BookData[];
@@ -36,7 +37,7 @@ export default function BookshelfCanvas({ books, onSelectBook, selectedBook }: B
         blur={2}
         far={3}
         resolution={256}
-        color="#000000"
+        color={primary.pureBlack}
       />
       <Bvh firstHitOnly>
         <Suspense fallback={null}>

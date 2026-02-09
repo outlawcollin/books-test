@@ -5,6 +5,7 @@ import { useTexture, Text } from "@react-three/drei";
 import { useSpring, animated } from "@react-spring/three";
 import * as THREE from "three";
 import type { BookData } from "@/lib/types";
+import { primary } from "@/lib/tokens";
 
 type BookState = "spine" | "cover";
 
@@ -18,7 +19,8 @@ interface Book3DProps {
 }
 
 const COVER_THICKNESS = 0.02;
-const PAGE_COLOR = "#f5f0e1";
+const SPINE_FONT = "/fonts/LibreBaskerville-Regular.ttf";
+const PAGE_COLOR = primary.bookBackground;
 
 // Shared materials — identical across all 25 books, created once
 const pageMaterial = new THREE.MeshStandardMaterial({ color: PAGE_COLOR, roughness: 0.95 });
@@ -104,11 +106,12 @@ const Book3D = memo(forwardRef<THREE.Group, Book3DProps>(function Book3D(
 
       {/* Spine text */}
       <Text
+        font={SPINE_FONT}
         position={[-width / 2 - COVER_THICKNESS - 0.005, 0, 0]}
         rotation={[0, -Math.PI / 2, Math.PI / 2]}
         fontSize={0.07}
         maxWidth={height * 0.85}
-        color="#ffffff"
+        color={primary.pureWhite}
         anchorX="center"
         anchorY="middle"
         textAlign="center"

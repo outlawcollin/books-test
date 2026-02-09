@@ -1,3 +1,6 @@
+export type TabId = "all-books" | "in-progress" | "my-copies";
+export type DetailTabId = "play-book" | "build-world" | "playthroughs";
+
 export interface BookData {
   id: string;
   title: string;
@@ -11,5 +14,5 @@ export interface BookData {
   publishedYear?: string;
   origin?: string;
   characters?: string[];
-  communityRewrites?: { premise: string }[];
+  communityRewrites?: { premise: string; coverUrl?: string }[];
 }

@@ -1,4 +1,5 @@
 import type { BookData } from "@/lib/types";
+import { BOOK_CHARACTERS } from "@/lib/characters";
 
 interface GutenbergAuthor {
   name: string;
@@ -27,6 +28,34 @@ const SPINE_COLORS = [
   "#7a3b3b", "#3b5a7a", "#5a7a3b", "#7a5a3b", "#3b7a5a",
 ];
 
+/** Fetch a real description from OpenLibrary */
+async function fetchOpenLibraryDescription(
+  title: string,
+  author: string
+): Promise<string | undefined> {
+  try {
+    const searchUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}&limit=1&fields=key`;
+    const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
+    if (!searchRes.ok) return undefined;
+
+    const searchData = await searchRes.json();
+    const workKey = searchData.docs?.[0]?.key;
+    if (!workKey) return undefined;
+
+    const workRes = await fetch(`https://openlibrary.org${workKey}.json`, {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!workRes.ok) return undefined;
+
+    const work = await workRes.json();
+    const desc = work.description;
+    if (!desc) return undefined;
+    return typeof desc === "string" ? desc : desc.value;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Flip "Austen, Jane" → "Jane Austen" */
 function flipAuthorName(name: string): string {
   const parts = name.split(", ");
@@ -46,46 +75,50 @@ export async function fetchGutenbergBooks(count: number): Promise<BookData[]> {
   }
 
   const data: GutenbergResponse = await res.json();
-  const books = data.results.slice(0, count);
+  // Skip books without a cover image so every shelf slot has art
+  const withCovers = data.results.filter((b) => b.formats["image/jpeg"]);
+  const books = withCovers.slice(0, count);
 
-  return books.map((book, i): BookData => {
-    const author = book.authors[0]
-      ? flipAuthorName(book.authors[0].name)
-      : "Unknown";
+  return Promise.all(
+    books.map(async (book, i): Promise<BookData> => {
+      const author = book.authors[0]
+        ? flipAuthorName(book.authors[0].name)
+        : "Unknown";
 
-    // Proxy covers through /api/cover — tries full-res first, falls back to medium-res
-    const fullRes = `https://www.gutenberg.org/files/${book.id}/${book.id}-h/images/cover.jpg`;
-    const mediumRes = book.formats["image/jpeg"] || undefined;
-    const coverImage = mediumRes
-      ? `/api/cover?url=${encodeURIComponent(fullRes)}&fallback=${encodeURIComponent(mediumRes)}`
-      : `/api/cover?url=${encodeURIComponent(fullRes)}`;
-    const spineColor = SPINE_COLORS[i % SPINE_COLORS.length];
+      // Proxy covers through /api/cover — tries full-res first, falls back to medium-res
+      const fullRes = `https://www.gutenberg.org/files/${book.id}/${book.id}-h/images/cover.jpg`;
+      const mediumRes = book.formats["image/jpeg"] || undefined;
+      const coverImage = mediumRes
+        ? `/api/cover?url=${encodeURIComponent(fullRes)}&fallback=${encodeURIComponent(mediumRes)}`
+        : `/api/cover?url=${encodeURIComponent(fullRes)}`;
+      const spineColor = SPINE_COLORS[i % SPINE_COLORS.length];
 
-    // Derive a rough published year from author death year
-    const authorObj = book.authors[0];
-    let publishedYear: string | undefined;
-    if (authorObj?.death_year && authorObj?.birth_year) {
-      // Rough midpoint of career
-      const midCareer = Math.round(
-        authorObj.birth_year + (authorObj.death_year - authorObj.birth_year) * 0.6
-      );
-      publishedYear = String(midCareer);
-    }
+      // Derive a rough published year from author death year
+      const authorObj = book.authors[0];
+      let publishedYear: string | undefined;
+      if (authorObj?.death_year && authorObj?.birth_year) {
+        // Rough midpoint of career
+        const midCareer = Math.round(
+          authorObj.birth_year + (authorObj.death_year - authorObj.birth_year) * 0.6
+        );
+        publishedYear = String(midCareer);
+      }
 
-    // Use first subject as a short description
-    const description = book.subjects[0] || undefined;
+      // Fetch real description from OpenLibrary
+      const description = await fetchOpenLibraryDescription(book.title, author);
 
-    return {
-      id: String(book.id),
-      title: book.title,
-      author,
-      coverImage,
-      spineColor,
-      description,
-      publishedYear,
-      chapters: [],
-      characters: [],
-      communityRewrites: [],
-    };
-  });
+      return {
+        id: String(book.id),
+        title: book.title,
+        author,
+        coverImage,
+        spineColor,
+        description,
+        publishedYear,
+        chapters: [],
+        characters: BOOK_CHARACTERS[String(book.id)] || [],
+        communityRewrites: [],
+      };
+    })
+  );
 }
