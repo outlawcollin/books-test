@@ -30,7 +30,7 @@ export default function BookDropdown({ book }: BookDropdownProps) {
           </p>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
           <span className="font-serif text-xs leading-[1.5] text-ink opacity-60">
             {book.author}
           </span>
