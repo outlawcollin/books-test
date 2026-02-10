@@ -44,7 +44,10 @@ export default function DetailTabs({ activeTab, onTabChange }: DetailTabsProps) 
   return (
     <div className="flex flex-col gap-6">
       <div className="relative">
-        <div className="flex gap-2 overflow-x-auto">
+        <div
+          className="flex gap-2 overflow-x-auto"
+          style={{ maskImage: "linear-gradient(to right, black 85%, transparent)", WebkitMaskImage: "linear-gradient(to right, black 85%, transparent)" }}
+        >
           {TABS.map(({ id, label, Icon }) => {
             const isActive = activeTab === id;
             return (
@@ -67,8 +70,6 @@ export default function DetailTabs({ activeTab, onTabChange }: DetailTabsProps) 
             );
           })}
         </div>
-        {/* Right fade gradient */}
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-book-background to-transparent" />
       </div>
       <div className="h-px w-full bg-[rgba(62,39,51,0.12)]" />
     </div>

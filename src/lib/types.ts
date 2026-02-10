@@ -15,6 +15,9 @@ export interface BookData {
   origin?: string;
   characters?: string[];
   communityRewrites?: { premise: string; coverUrl?: string }[];
+  hasPlaythrough?: boolean;
+  isMyCopy?: boolean;
+  isLoading?: boolean;
 }
 
 export interface Playthrough {

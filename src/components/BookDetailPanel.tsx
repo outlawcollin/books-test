@@ -17,7 +17,6 @@ interface BookDetailPanelProps {
 
 export default function BookDetailPanel({ book, onStartChat, initialTab, initialPremise }: BookDetailPanelProps) {
   const [activeTab, setActiveTab] = useState<DetailTabId>(initialTab ?? "play-book");
-
   return (
     <div className="flex h-full font-serif text-ink">
       {/* Center column */}
@@ -31,7 +30,7 @@ export default function BookDetailPanel({ book, onStartChat, initialTab, initial
         {activeTab === "playthroughs" && <PlaythroughsTab book={book} />}
       </div>
 
-      {/* Divider + Community Rewrites — hidden below lg (1024px) */}
+      {/* Divider + Community Rewrites */}
       <div className="w-px shrink-0 self-stretch bg-[rgba(62,39,51,0.12)] hide-below-lg" />
       <CommunityRewrites book={book} className="hide-below-lg" />
     </div>

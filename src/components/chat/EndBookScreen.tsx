@@ -1,9 +1,4 @@
-"use client";
-
-import dynamic from "next/dynamic";
 import type { BookData } from "@/lib/types";
-
-const MiniBookCanvas = dynamic(() => import("../detail/MiniBookCanvas"), { ssr: false });
 
 interface EndBookScreenProps {
   book: BookData;
@@ -67,7 +62,13 @@ export default function EndBookScreen({ book, onKeepPlaying, onFinish, onSelectR
                 onClick={() => onSelectRewrite(rewrite.premise)}
                 className="flex w-[172px] cursor-pointer flex-col items-center gap-3 text-center max-md:w-auto"
               >
-                <MiniBookCanvas book={book} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={book.coverImage || book.coverImageFallback}
+                  alt={book.title}
+                  className="h-[172px] w-[124px] border border-ink/8 object-cover shadow-sm"
+                  style={{ backgroundColor: book.spineColor ?? "#1a1a2e" }}
+                />
                 <p className="text-xs leading-[1.3] text-pure-black">
                   {rewrite.premise}
                 </p>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback, createRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useScroll } from "@react-three/drei";
 import { MathUtils, type Group } from "three";
 import Book3D from "./Book3D";
@@ -11,6 +11,7 @@ interface BookGroupProps {
   books: BookData[];
   onSelectBook?: (book: BookData) => void;
   selectedBook?: BookData | null;
+  spacerCenterY?: number | null;
 }
 
 type BookState = "spine" | "cover";
@@ -18,14 +19,14 @@ type BookState = "spine" | "cover";
 const BOOK_SPACING = 0.65;
 const COVER_SPREAD = 0.8;
 const LERP_SPEED = 0.08;
-const ENTER_LERP_SPEED = 0.07;
-const DETAIL_X = -2.4;
 const DETAIL_Z = 0.3;
 const DETAIL_SCALE = 0.5;
 const OFFSCREEN_X = 10;
+const OVERLAY_COLUMN_WIDTH_PX = 400; // matches BookInfoOverlay max-w-[400px]
 
-export default function BookGroup({ books, onSelectBook, selectedBook }: BookGroupProps) {
+export default function BookGroup({ books, onSelectBook, selectedBook, spacerCenterY }: BookGroupProps) {
   const scroll = useScroll();
+  const { viewport, size } = useThree();
   const [activeIndex, setActiveIndex] = useState(0);
   const activeRef = useRef(0);
   const initialized = useRef(false);
@@ -39,7 +40,7 @@ export default function BookGroup({ books, onSelectBook, selectedBook }: BookGro
     ? books.findIndex((b) => b.id === selectedBook.id)
     : -1;
 
-  useFrame(() => {
+  useFrame((state) => {
     if (!scroll) return;
 
     const offset = scroll.offset;
@@ -54,6 +55,14 @@ export default function BookGroup({ books, onSelectBook, selectedBook }: BookGro
       setActiveIndex(clamped);
     }
 
+    // Compute detail X and Y at the book's actual z-plane (not z=0)
+    const columnCenterPx = OVERLAY_COLUMN_WIDTH_PX / 2;
+    const vp = viewport.getCurrentViewport(state.camera, [0, 0, DETAIL_Z]);
+    const detailX = ((columnCenterPx / size.width) - 0.5) * vp.width;
+    const detailY = spacerCenterY != null
+      ? (0.5 - spacerCenterY / size.height) * vp.height
+      : 0;
+
     const inDetail = selectedBook && selectedIndex >= 0;
 
     for (let i = 0; i < total; i++) {
@@ -64,26 +73,35 @@ export default function BookGroup({ books, onSelectBook, selectedBook }: BookGro
         const isSelected = i === selectedIndex;
 
         if (isSelected) {
-          // Lerp selected book to detail position
-          ref.position.x = MathUtils.lerp(ref.position.x, DETAIL_X, ENTER_LERP_SPEED);
-          ref.position.z = MathUtils.lerp(ref.position.z, DETAIL_Z, ENTER_LERP_SPEED);
-          const s = MathUtils.lerp(ref.scale.x, DETAIL_SCALE, ENTER_LERP_SPEED);
+          // Lerp to detail position — same system and speed as exit
+          ref.position.x = MathUtils.lerp(ref.position.x, detailX, LERP_SPEED);
+          ref.position.y = MathUtils.lerp(ref.position.y, detailY, 0.05);
+          ref.position.z = MathUtils.lerp(ref.position.z, DETAIL_Z, LERP_SPEED);
+          const s = MathUtils.lerp(ref.scale.x, DETAIL_SCALE, 0.1);
           ref.scale.set(s, s, s);
         } else {
-          // Books left of selected exit left, books right exit right
+          // Slide offscreen + fade (gentle exit so books don't shoot away)
           const exitX = i < selectedIndex ? -OFFSCREEN_X : OFFSCREEN_X;
-          ref.position.x = MathUtils.lerp(ref.position.x, exitX, 0.08);
+          ref.position.x = MathUtils.lerp(ref.position.x, exitX, 0.04);
           ref.traverse((child) => {
-            // Skip troika text meshes — SDF shader looks wrong at partial opacity
             if ("text" in child) return;
             const mesh = child as { isMesh?: boolean; material?: { transparent: boolean; opacity: number } };
             if (mesh.isMesh && mesh.material) {
               mesh.material.transparent = true;
-              mesh.material.opacity = MathUtils.lerp(mesh.material.opacity, 0, 0.08);
+              mesh.material.opacity = MathUtils.lerp(mesh.material.opacity, 0, 0.1);
             }
           });
+          // Hide once fully faded — prevents ghost raycasting and wasted draw calls
+          if (!ref.visible) continue;
+          const firstChild = ref.children[0] as { isMesh?: boolean; material?: { opacity: number } } | undefined;
+          if (firstChild?.isMesh && firstChild.material && firstChild.material.opacity < 0.01) {
+            ref.visible = false;
+          }
         }
       } else {
+        // Restore visibility for books returning from detail mode
+        if (!ref.visible) ref.visible = true;
+
         // Normal shelf positioning
         const isActive = i === clamped;
         let spreadOffset = 0;
@@ -96,9 +114,11 @@ export default function BookGroup({ books, onSelectBook, selectedBook }: BookGro
 
         if (!initialized.current) {
           ref.position.x = targetX;
+          ref.position.y = 0;
           ref.position.z = targetZ;
         } else {
           ref.position.x = MathUtils.lerp(ref.position.x, targetX, LERP_SPEED);
+          ref.position.y = MathUtils.lerp(ref.position.y, 0, 0.05);
           ref.position.z = MathUtils.lerp(ref.position.z, targetZ, LERP_SPEED);
         }
 

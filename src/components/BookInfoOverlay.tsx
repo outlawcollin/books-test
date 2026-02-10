@@ -1,15 +1,34 @@
 "use client";
 
+import { useRef, useLayoutEffect, useCallback } from "react";
 import type { BookData } from "@/lib/types";
 import AllBooksIcon from "./icons/AllBooksIcon";
 
 interface BookInfoOverlayProps {
   book: BookData;
   onBack: () => void;
+  onSpacerMeasure?: (centerY: number) => void;
   className?: string;
 }
 
-export default function BookInfoOverlay({ book, onBack, className }: BookInfoOverlayProps) {
+export default function BookInfoOverlay({ book, onBack, onSpacerMeasure, className }: BookInfoOverlayProps) {
+  const spacerRef = useRef<HTMLDivElement>(null);
+
+  const measure = useCallback(() => {
+    if (!spacerRef.current || !onSpacerMeasure) return;
+    const rect = spacerRef.current.getBoundingClientRect();
+    onSpacerMeasure(rect.top + rect.height / 2);
+  }, [onSpacerMeasure]);
+
+  useLayoutEffect(() => {
+    measure();
+    const el = spacerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener("resize", measure);
+    return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
+  }, [measure]);
   return (
     <div
       className={`flex min-w-0 flex-1 max-w-[400px] flex-col items-center justify-center gap-6 overflow-hidden px-8 py-12 font-serif text-ink ${className || ""}`}
@@ -36,7 +55,7 @@ export default function BookInfoOverlay({ book, onBack, className }: BookInfoOve
       </div>
 
       {/* Spacer — 3D book is visible through canvas below */}
-      <div className="h-[220px] w-[180px] shrink-0" />
+      <div ref={spacerRef} className="h-[220px] w-[180px] shrink-0" />
 
       {/* Book info */}
       <div className="flex max-w-[396px] flex-col items-center gap-4">

@@ -49,7 +49,7 @@ export default function CharacterPicker({
 
       <div className="flex">
         {/* Fixed left: Persona + divider */}
-        <div className="z-10 flex shrink-0 items-center gap-4 bg-book-background">
+        <div className="z-10 flex shrink-0 items-center gap-4">
           <button
             onClick={onAddPersona}
             className="flex shrink-0 cursor-pointer flex-col items-center gap-1.5"
@@ -86,8 +86,10 @@ export default function CharacterPicker({
 
         {/* Scrollable right: characters */}
         <div className="relative flex-1 overflow-hidden">
-          <div className="flex gap-4 overflow-x-auto pl-4">
-
+          <div
+            className="flex gap-4 overflow-x-auto pl-4"
+            style={{ maskImage: "linear-gradient(to right, transparent, black 8%, black 85%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 85%, transparent)" }}
+          >
             {characters.map((name, i) => {
               const isSelected = selectedIndex === i;
               return (
@@ -119,10 +121,6 @@ export default function CharacterPicker({
               );
             })}
           </div>
-
-          {/* Fade gradients */}
-          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-book-background to-transparent" />
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-book-background to-transparent" />
         </div>
       </div>
     </div>

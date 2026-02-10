@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Caveat font — used in canvas textures (3D book tape label) */
+@font-face {
+  font-family: "Caveat";
+  src: url("/fonts/Caveat-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+
 /* ─── Color Tokens (Character.ai Brand Guidelines v1.0) ──────────────────── */
 /* Source: Figma Brand Guidelines — pages 126 (Digital Palette), 129 (Secondary) */
 

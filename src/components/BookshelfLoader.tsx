@@ -10,6 +10,7 @@ import ShelfNav from "./ShelfNav";
 import AddBookModal, { type WebBook } from "./AddBookModal";
 import ChatPanel from "./chat/ChatPanel";
 
+
 const BookshelfCanvas = dynamic(
   () => import("@/components/BookshelfCanvas"),
   {
@@ -59,6 +60,8 @@ export default function BookshelfLoader({
   const [chatSession, setChatSession] = useState<ChatSession | null>(null);
   const [initialDetailTab, setInitialDetailTab] = useState<DetailTabId | undefined>();
   const [initialPremise, setInitialPremise] = useState<string | undefined>();
+  const [spacerCenterY, setSpacerCenterY] = useState<number | null>(null);
+  const [localBooks, setLocalBooks] = useState<BookData[]>([]);
 
   const handleSelectBook = useCallback((book: BookData) => {
     setSelectedBook(book);
@@ -105,6 +108,15 @@ export default function BookshelfLoader({
     setUploadingBooks((prev) => [...prev, book]);
     setTimeout(() => {
       setUploadingBooks((prev) => prev.filter((b) => b.id !== book.id));
+      // Add the finished book to the shelf as a real BookData
+      const SPINE_COLORS = ["#6b1d1d", "#8b6914", "#1a4a6b", "#4a6741", "#5c3d6e", "#73433d", "#2d5a4a"];
+      setLocalBooks((prev) => [{
+        id: `local-${book.id}`,
+        title: book.title,
+        author: book.source,
+        spineColor: SPINE_COLORS[Math.floor(Math.random() * SPINE_COLORS.length)],
+        isMyCopy: true,
+      }, ...prev]);
     }, 3000);
   }, []);
 
@@ -120,54 +132,94 @@ export default function BookshelfLoader({
 
   return (
     <main className="relative h-dvh w-dvw overflow-hidden bg-book-background">
-      {/* Canvas — full viewport */}
-      {activeTab === "all-books" ? (
-        <BookshelfCanvas
-          books={books}
-          onSelectBook={handleSelectBook}
-          selectedBook={selectedBook}
-        />
-      ) : activeTab === "my-copies" && uploadingBooks.length > 0 ? (
-        <div className="flex size-full items-center justify-center">
-          <div className="flex flex-col items-center gap-6">
-            {uploadingBooks.map((book) => (
-              <div
-                key={book.id}
-                className="flex h-[480px] w-[320px] items-center justify-center rounded-sm border border-espresso/10 overflow-hidden"
-                style={{
-                  background: "linear-gradient(110deg, var(--color-book-background) 30%, rgba(255,255,255,0.5) 50%, var(--color-book-background) 70%)",
-                  backgroundSize: "200% 100%",
-                  animation: "shimmer-line 2s ease-in-out infinite",
-                }}
-              >
-                <p className="font-serif text-sm text-ink/70">
-                  Uploading &ldquo;{book.title}&rdquo;&hellip;
-                </p>
-              </div>
-            ))}
+
+      {/* Canvas — full viewport, filtered by active tab */}
+      {(() => {
+        const allBooks = [...localBooks, ...books];
+        let filtered =
+          activeTab === "my-copies" ? allBooks.filter((b) => b.isMyCopy) :
+          activeTab === "in-progress" ? allBooks.filter((b) => b.hasPlaythrough) :
+          allBooks;
+
+        // Prepend loading placeholders so BookGroup positions them at center,
+        // pushing existing books to the right
+        if (activeTab === "my-copies" && uploadingBooks.length > 0) {
+          const loadingBooks: BookData[] = uploadingBooks.map((wb) => ({
+            id: `loading-${wb.id}`,
+            title: wb.title,
+            author: wb.source,
+            isMyCopy: true,
+            isLoading: true,
+            spineColor: "#d4cec6",
+          }));
+          filtered = [...loadingBooks, ...filtered];
+        }
+
+        return (
+          <BookshelfCanvas
+            books={filtered}
+            onSelectBook={handleSelectBook}
+            selectedBook={selectedBook}
+            spacerCenterY={spacerCenterY}
+          />
+        );
+      })()}
+
+      {/* Empty tab message — overlay so canvas stays mounted */}
+      {(() => {
+        if (activeTab === "all-books" || selectedBook) return null;
+        const allBooks = [...localBooks, ...books];
+        const filtered =
+          activeTab === "my-copies" ? allBooks.filter((b) => b.isMyCopy) :
+          allBooks.filter((b) => b.hasPlaythrough);
+        if (filtered.length > 0 || uploadingBooks.length > 0) return null;
+        return (
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+            <p className="font-serif text-base text-ink opacity-50">
+              {EMPTY_MESSAGES[activeTab]}
+            </p>
           </div>
-        </div>
-      ) : (
-        <div className="flex size-full items-center justify-center">
-          <p className="font-serif text-base text-ink opacity-50">
-            {EMPTY_MESSAGES[activeTab]}
-          </p>
+        );
+      })()}
+
+      {/* Upload shimmer overlay — shows while a book is being added */}
+      {activeTab === "my-copies" && uploadingBooks.length > 0 && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          {uploadingBooks.map((book) => (
+            <div
+              key={book.id}
+              className="flex aspect-[2/3] w-[200px] flex-col items-center justify-center rounded-sm border border-espresso/10 overflow-hidden text-center px-4"
+              style={{
+                background: "linear-gradient(110deg, var(--color-book-background) 30%, rgba(255,255,255,0.5) 50%, var(--color-book-background) 70%)",
+                backgroundSize: "200% 100%",
+                animation: "shimmer-line 2s ease-in-out infinite",
+              }}
+            >
+              <p className="font-serif text-sm text-ink/70">
+                Uploading &ldquo;{book.title}&rdquo;&hellip;
+              </p>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Hero heading — floating overlay at top */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 pt-6 md:pt-14">
-        {children}
-      </div>
+      {/* Hero heading — floating overlay at top (hidden in detail view) */}
+      {!selectedBook && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 pt-6 md:pt-14">
+          {children}
+        </div>
+      )}
 
-      {/* Bottom navigation — floating overlay at bottom */}
-      <div className="absolute inset-x-0 bottom-0 pb-[env(safe-area-inset-bottom)] md:pb-8">
-        <ShelfNav
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          onAddBook={handleAddBook}
-        />
-      </div>
+      {/* Bottom navigation — floating overlay at bottom (hidden in detail view) */}
+      {!selectedBook && (
+        <div className="absolute inset-x-0 bottom-0 pb-[env(safe-area-inset-bottom)] md:pb-8">
+          <ShelfNav
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onAddBook={handleAddBook}
+          />
+        </div>
+      )}
 
       {/* Detail overlay — fixed to cover entire viewport */}
       {selectedBook && (
@@ -187,7 +239,7 @@ export default function BookshelfLoader({
           )}
 
           {/* Left info column + divider (hidden on mobile) */}
-          <BookInfoOverlay book={selectedBook} onBack={handleBackToShelf} className="max-md:hidden" />
+          <BookInfoOverlay book={selectedBook} onBack={handleBackToShelf} onSpacerMeasure={setSpacerCenterY} className="max-md:hidden" />
           <div className="w-px shrink-0 bg-[rgba(62,39,51,0.12)] max-md:hidden" />
 
           {/* Content panel — swaps between detail tabs and chat */}

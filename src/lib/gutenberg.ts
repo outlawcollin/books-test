@@ -90,6 +90,8 @@ export async function fetchGutenbergBooks(count: number): Promise<BookData[]> {
         chapters: [],
         characters: BOOK_CHARACTERS[String(book.id)] || [],
         communityRewrites: [],
+        hasPlaythrough: i === 0 || i === 2 || i === 4,
+        isMyCopy: false,
       };
     })
   );

@@ -37,7 +37,7 @@ export default function SelectionCard({
   return (
     <button
       onClick={onClick}
-      className={`relative flex flex-1 cursor-pointer ${isInline ? "items-center gap-0.5" : "flex-col gap-0.5"} rounded-[20px] bg-white p-4 text-left font-serif transition-colors border-[1.5px] ${borderColor} ${className}`}
+      className={`relative flex flex-1 cursor-pointer ${isInline ? "items-center gap-0.5" : "flex-col gap-0.5"} rounded-[20px] bg-white/60 p-4 text-left font-serif transition-colors border-[1.5px] ${borderColor} ${className}`}
     >
       <div className="flex flex-1 flex-col gap-0.5">
         <p className="text-base leading-[1.5] text-ink opacity-80">{title}</p>

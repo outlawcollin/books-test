@@ -59,7 +59,7 @@ export default function BuildWorldTab({ book, onStartChat, initialPremise }: Bui
         </div>
 
         {/* Textarea card */}
-        <div className="flex flex-1 flex-col justify-between rounded-[20px] border border-[rgba(62,39,51,0.12)] bg-white p-5">
+        <div className="flex flex-1 flex-col justify-between rounded-[20px] border border-[rgba(62,39,51,0.12)] bg-white/60 p-5">
           <textarea
             value={premiseText}
             onChange={(e) => setPremiseText(e.target.value)}

@@ -1,9 +1,5 @@
-"use client";
-
-import dynamic from "next/dynamic";
+import { PaperTexture } from "@paper-design/shaders-react";
 import type { BookData } from "@/lib/types";
-
-const MiniBookCanvas = dynamic(() => import("./MiniBookCanvas"), { ssr: false });
 
 interface CommunityRewritesProps {
   book: BookData;
@@ -33,7 +29,7 @@ export default function CommunityRewrites({ book, className }: CommunityRewrites
     <div className={`relative flex h-full max-w-[224px] min-w-[180px] flex-col items-center ${className || ""}`}>
       {/* Pill header — outside scroll area so tooltip isn't clipped */}
       <div className="relative z-10 flex w-full shrink-0 flex-col items-center">
-        <div className="flex w-full items-center justify-center bg-book-background px-6 pb-2 pt-6">
+        <div className="flex w-full items-center justify-center px-6 pb-2 pt-6">
           <div className="group relative flex items-center gap-1.5 font-serif text-sm leading-[1.5] text-ink">
             Rewrites
             <span className="opacity-50 group-hover:opacity-100">
@@ -44,19 +40,36 @@ export default function CommunityRewrites({ book, className }: CommunityRewrites
             </span>
           </div>
         </div>
-        {/* Gradient overlays scroll content */}
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-3 translate-y-full bg-gradient-to-b from-book-background to-transparent" />
       </div>
 
       {/* Scrollable content */}
-      <div className="w-full flex-1 overflow-y-auto">
-        <div className="flex flex-col items-center gap-6 px-6 pb-6 pt-3">
+      <div
+        className="w-full flex-1 overflow-y-auto"
+        style={{ maskImage: "linear-gradient(to bottom, transparent, black 12px, black 90%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, transparent, black 12px, black 90%, transparent)" }}
+      >
+        <div className="flex flex-col items-center gap-8 px-6 pb-6 pt-3">
           {rewrites.map((rewrite, i) => (
             <div
               key={i}
               className="flex w-[172px] cursor-pointer flex-col items-center gap-3 text-center"
             >
-              <MiniBookCanvas book={book} />
+              <div className="relative h-[172px] w-[124px] overflow-hidden border border-ink/8 shadow-sm">
+                <PaperTexture
+                  contrast={0.15} roughness={0.3} fiber={0.2} fiberSize={0.15}
+                  crumples={0.1} crumpleSize={0.15} folds={0.15} foldCount={3}
+                  fade={0} drops={0.02} seed={3.2 + i} scale={0.5}
+                  colorBack="#00000000" colorFront="#3e273315"
+                  className="pointer-events-none absolute inset-0"
+                  style={{ backgroundColor: "#f4f0e9" }}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={book.coverImage || book.coverImageFallback}
+                  alt={book.title}
+                  className="relative h-full w-full object-cover"
+                  style={{ backgroundColor: book.spineColor ?? "#1a1a2e" }}
+                />
+              </div>
               <p className="text-xs leading-[1.4] text-pure-black">
                 {rewrite.premise}
               </p>
