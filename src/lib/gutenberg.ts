@@ -1,5 +1,6 @@
 import type { BookData } from "@/lib/types";
 import { BOOK_CHARACTERS } from "@/lib/characters";
+import { BOOK_DESCRIPTIONS } from "@/lib/descriptions";
 
 interface GutenbergAuthor {
   name: string;
@@ -27,34 +28,6 @@ const SPINE_COLORS = [
   "#3d6e5c", "#6e3d4a", "#4a6e3d", "#5c6e3d", "#3d5c6e",
   "#7a3b3b", "#3b5a7a", "#5a7a3b", "#7a5a3b", "#3b7a5a",
 ];
-
-/** Fetch a real description from OpenLibrary */
-async function fetchOpenLibraryDescription(
-  title: string,
-  author: string
-): Promise<string | undefined> {
-  try {
-    const searchUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}&limit=1&fields=key`;
-    const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
-    if (!searchRes.ok) return undefined;
-
-    const searchData = await searchRes.json();
-    const workKey = searchData.docs?.[0]?.key;
-    if (!workKey) return undefined;
-
-    const workRes = await fetch(`https://openlibrary.org${workKey}.json`, {
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!workRes.ok) return undefined;
-
-    const work = await workRes.json();
-    const desc = work.description;
-    if (!desc) return undefined;
-    return typeof desc === "string" ? desc : desc.value;
-  } catch {
-    return undefined;
-  }
-}
 
 /** Flip "Austen, Jane" → "Jane Austen" */
 function flipAuthorName(name: string): string {
@@ -104,8 +77,7 @@ export async function fetchGutenbergBooks(count: number): Promise<BookData[]> {
         publishedYear = String(midCareer);
       }
 
-      // Fetch real description from OpenLibrary
-      const description = await fetchOpenLibraryDescription(book.title, author);
+      const description = BOOK_DESCRIPTIONS[String(book.id)];
 
       return {
         id: String(book.id),

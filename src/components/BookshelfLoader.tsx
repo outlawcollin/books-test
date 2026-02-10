@@ -125,12 +125,12 @@ export default function BookshelfLoader({
       )}
 
       {/* Hero heading — floating overlay at top */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 pt-14 md:pt-14">
+      <div className="pointer-events-none absolute inset-x-0 top-0 pt-6 md:pt-14">
         {children}
       </div>
 
       {/* Bottom navigation — floating overlay at bottom */}
-      <div className="absolute inset-x-0 bottom-0 pb-8">
+      <div className="absolute inset-x-0 bottom-0 pb-4 md:pb-8">
         <ShelfNav
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -142,14 +142,14 @@ export default function BookshelfLoader({
       {selectedBook && (
         <div className="fixed inset-0 z-10 flex md:pointer-events-none max-md:flex-col max-md:overflow-y-auto max-md:bg-book-background">
           {/* Mobile header: back button + book dropdown */}
-          <div className="shrink-0 p-4 md:hidden" style={{ pointerEvents: "auto" }}>
-            <button
+          <div className="shrink-0 px-4 pt-4 md:hidden" style={{ pointerEvents: "auto" }}>
+            {/* <button
               onClick={handleBack}
               className="mb-4 flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-[rgba(101,46,31,0.12)] text-espresso"
               aria-label="Go back"
             >
               <ArrowLeftIcon />
-            </button>
+            </button> */}
             <BookDropdown book={selectedBook} />
           </div>
 
@@ -159,7 +159,7 @@ export default function BookshelfLoader({
 
           {/* Content panel */}
           <div
-            className="flex-1 overflow-hidden bg-book-background"
+            className="md:flex-1 md:overflow-hidden bg-book-background"
             style={{ pointerEvents: "auto" }}
           >
             <BookDetailPanel book={selectedBook} />

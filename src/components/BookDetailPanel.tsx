@@ -16,7 +16,7 @@ export default function BookDetailPanel({ book }: BookDetailPanelProps) {
   return (
     <div className="flex h-full font-serif text-ink">
       {/* Center column */}
-      <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-6">
+      <div className="flex flex-1 flex-col gap-6 md:overflow-y-auto p-6">
         <DetailTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {activeTab === "play-book" && <PlayBookTab book={book} />}
