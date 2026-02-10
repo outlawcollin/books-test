@@ -43,24 +43,28 @@ const TABS: { id: DetailTabId; label: string; Icon: () => React.JSX.Element }[] 
 export default function DetailTabs({ activeTab, onTabChange }: DetailTabsProps) {
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex gap-1 overflow-x-auto">
-        {TABS.map(({ id, label, Icon }) => {
-          const isActive = activeTab === id;
-          return (
-            <button
-              key={id}
-              onClick={() => onTabChange(id)}
-              className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-4 py-2 font-serif text-sm leading-[1.5] transition-colors ${
-                isActive
-                  ? "bg-dark-sage text-pure-white"
-                  : "text-ink hover:bg-ink/[0.04]"
-              }`}
-            >
-              <Icon />
-              {label}
-            </button>
-          );
-        })}
+      <div className="relative">
+        <div className="flex gap-1 overflow-x-auto">
+          {TABS.map(({ id, label, Icon }) => {
+            const isActive = activeTab === id;
+            return (
+              <button
+                key={id}
+                onClick={() => onTabChange(id)}
+                className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-4 py-2 font-serif text-sm leading-[1.5] transition-colors ${
+                  isActive
+                    ? "bg-dark-sage text-pure-white"
+                    : "text-ink hover:bg-ink/[0.04]"
+                }`}
+              >
+                <Icon />
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        {/* Right fade gradient */}
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-book-background to-transparent" />
       </div>
       <div className="h-px w-full bg-[rgba(62,39,51,0.12)]" />
     </div>

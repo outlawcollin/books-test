@@ -5,6 +5,7 @@ interface CharacterPickerProps {
   selectedIndex: number | null;
   onSelect: (index: number) => void;
   onAddPersona?: () => void;
+  persona?: { name: string; avatar: string } | null;
 }
 
 function CheckBadge() {
@@ -29,6 +30,7 @@ export default function CharacterPicker({
   selectedIndex,
   onSelect,
   onAddPersona,
+  persona,
 }: CharacterPickerProps) {
   return (
     <div className="flex flex-col gap-4">
@@ -41,59 +43,83 @@ export default function CharacterPicker({
         </p>
       </div>
 
-      <div className="relative">
-        <div className="flex gap-4 overflow-x-auto">
-          {/* Persona add button */}
-          <div className="flex shrink-0 flex-col items-center gap-1.5">
-            <button
-              onClick={onAddPersona}
-              className="flex size-[92px] cursor-pointer items-center justify-center rounded-full border-[1.5px] border-dashed border-[rgba(62,39,51,0.42)] text-ink"
-            >
-              <PlusIcon />
-            </button>
-            <span className="font-serif text-sm leading-[1.5] text-ink opacity-80">
-              Persona
-            </span>
-          </div>
-
-          {/* Divider */}
-          <div className="my-auto h-[92px] w-px shrink-0 bg-[rgba(62,39,51,0.15)]" />
-
-          {/* Character circles */}
-          {characters.map((name, i) => {
-            const isSelected = selectedIndex === i;
-            return (
-              <button
-                key={i}
-                onClick={() => onSelect(i)}
-                className="flex shrink-0 cursor-pointer flex-col items-center gap-1.5"
-              >
+      <div className="flex">
+        {/* Fixed left: Persona + divider */}
+        <div className="z-10 flex shrink-0 items-center gap-4 bg-book-background">
+          <button
+            onClick={onAddPersona}
+            className="flex shrink-0 cursor-pointer flex-col items-center gap-1.5"
+          >
+            {persona ? (
+              <>
                 <div className="relative">
                   <img
-                    src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(name)}&size=184`}
-                    alt={name}
-                    className={`size-[92px] rounded-full bg-ink object-cover shadow-[0px_4px_32px_rgba(62,39,51,0.04)] ${
-                      isSelected
-                        ? "border-[1.5px] border-dark-sage"
-                        : "border-[1.5px] border-[rgba(255,255,255,0.24)]"
-                    }`}
+                    src={persona.avatar}
+                    alt={persona.name}
+                    className="size-[92px] rounded-full border-[1.5px] border-dark-sage object-cover shadow-[0px_4px_32px_rgba(62,39,51,0.04)]"
                   />
-                  {isSelected && (
-                    <span className="absolute -right-px -top-px text-dark-sage">
-                      <CheckBadge />
-                    </span>
-                  )}
+                  <span className="absolute -right-px -top-px text-dark-sage">
+                    <CheckBadge />
+                  </span>
                 </div>
                 <span className="font-serif text-sm leading-[1.5] text-ink opacity-80">
-                  {name}
+                  {persona.name}
                 </span>
-              </button>
-            );
-          })}
+              </>
+            ) : (
+              <>
+                <div className="flex size-[92px] items-center justify-center rounded-full border-[1.5px] border-dashed border-[rgba(62,39,51,0.42)] text-ink">
+                  <PlusIcon />
+                </div>
+                <span className="font-serif text-sm leading-[1.5] text-ink opacity-80">
+                  Persona
+                </span>
+              </>
+            )}
+          </button>
+          <div className="w-px self-stretch bg-[rgba(62,39,51,0.15)]" />
         </div>
 
-        {/* Right fade gradient */}
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-book-background to-transparent" />
+        {/* Scrollable right: characters */}
+        <div className="relative flex-1 overflow-hidden">
+          <div className="flex gap-4 overflow-x-auto pl-4">
+
+            {characters.map((name, i) => {
+              const isSelected = selectedIndex === i;
+              return (
+                <button
+                  key={i}
+                  onClick={() => onSelect(i)}
+                  className="flex shrink-0 cursor-pointer flex-col items-center gap-1.5"
+                >
+                  <div className="relative">
+                    <img
+                      src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(name)}&size=184`}
+                      alt={name}
+                      className={`size-[92px] rounded-full bg-ink object-cover shadow-[0px_4px_32px_rgba(62,39,51,0.04)] ${
+                        isSelected
+                          ? "border-[1.5px] border-dark-sage"
+                          : "border-[1.5px] border-[rgba(255,255,255,0.24)]"
+                      }`}
+                    />
+                    {isSelected && (
+                      <span className="absolute -right-px -top-px text-dark-sage">
+                        <CheckBadge />
+                      </span>
+                    )}
+                  </div>
+                  <span className="font-serif text-sm leading-[1.5] text-ink opacity-80">
+                    {name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Fade gradients */}
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-book-background to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-book-background to-transparent" />
+        </div>
       </div>
     </div>
   );

@@ -4,13 +4,15 @@ import { useState } from "react";
 import type { BookData } from "@/lib/types";
 import CharacterPicker from "./CharacterPicker";
 import SelectionCard from "./SelectionCard";
+import PersonaModal, { type Persona } from "./PersonaModal";
 
 interface PlayBookTabProps {
   book: BookData;
-  onAddPersona?: () => void;
 }
 
-export default function PlayBookTab({ book, onAddPersona }: PlayBookTabProps) {
+export default function PlayBookTab({ book }: PlayBookTabProps) {
+  const [personaModalOpen, setPersonaModalOpen] = useState(false);
+  const [selectedPersona, setSelectedPersona] = useState<Persona | null>(null);
   const characters = book.characters?.length
     ? book.characters
     : ["Protagonist", "Narrator", "Companion", "Rival", "Mentor"];
@@ -25,8 +27,9 @@ export default function PlayBookTab({ book, onAddPersona }: PlayBookTabProps) {
       <CharacterPicker
         characters={characters}
         selectedIndex={selectedCharacter}
-        onSelect={setSelectedCharacter}
-        onAddPersona={onAddPersona}
+        onSelect={(i) => { setSelectedCharacter(i); setSelectedPersona(null); }}
+        onAddPersona={() => setPersonaModalOpen(true)}
+        persona={selectedPersona}
       />
 
       {/* Story Mode */}
@@ -94,11 +97,16 @@ export default function PlayBookTab({ book, onAddPersona }: PlayBookTabProps) {
       <div className="flex-1 max-md:hidden" />
 
       {/* CTA — fixed at bottom on mobile */}
-      <div className="max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:border-t max-md:border-[rgba(62,39,51,0.12)] max-md:bg-book-background max-md:p-4">
+      <div className="max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:border-t max-md:border-[rgba(62,39,51,0.12)] max-md:bg-book-background max-md:px-4 max-md:pt-4 max-md:pb-[env(safe-area-inset-bottom)]">
         <button className="w-full cursor-pointer rounded-[44px] bg-dark-sage px-5 py-4 font-serif text-base text-pure-white transition-opacity hover:opacity-90">
           Dive in!
         </button>
       </div>
+      <PersonaModal
+        isOpen={personaModalOpen}
+        onClose={() => setPersonaModalOpen(false)}
+        onSelect={(p) => { setSelectedPersona(p); setSelectedCharacter(null); }}
+      />
     </div>
   );
 }
