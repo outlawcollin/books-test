@@ -159,7 +159,7 @@ export default function BookshelfLoader({
 
           {/* Content panel */}
           <div
-            className="md:flex-1 md:overflow-hidden bg-book-background"
+            className="w-full md:flex-1 md:overflow-hidden bg-book-background"
             style={{ pointerEvents: "auto" }}
           >
             <BookDetailPanel book={selectedBook} />
