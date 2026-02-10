@@ -7,6 +7,7 @@ interface SelectionCardProps {
   onClick?: () => void;
   className?: string;
   checkPosition?: "inline" | "bottom-right";
+  color?: "green" | "purple";
 }
 
 function CheckIcon() {
@@ -25,29 +26,30 @@ export default function SelectionCard({
   onClick,
   className = "",
   checkPosition = "inline",
+  color = "green",
 }: SelectionCardProps) {
   const isInline = checkPosition === "inline";
+  const borderColor = selected
+    ? color === "purple" ? "border-[#6b2e63]" : "border-dark-sage"
+    : "border-[rgba(62,39,51,0.12)]";
+  const checkColor = color === "purple" ? "text-[#6b2e63]" : "text-dark-sage";
 
   return (
     <button
       onClick={onClick}
-      className={`relative flex flex-1 cursor-pointer ${isInline ? "items-center gap-0.5" : "flex-col gap-0.5"} rounded-[20px] bg-white p-4 text-left font-serif transition-colors ${
-        selected
-          ? "border-[1.5px] border-dark-sage"
-          : "border-[1.5px] border-[rgba(62,39,51,0.12)]"
-      } ${className}`}
+      className={`relative flex flex-1 cursor-pointer ${isInline ? "items-center gap-0.5" : "flex-col gap-0.5"} rounded-[20px] bg-white p-4 text-left font-serif transition-colors border-[1.5px] ${borderColor} ${className}`}
     >
       <div className="flex flex-1 flex-col gap-0.5">
         <p className="text-base leading-[1.5] text-ink opacity-80">{title}</p>
         <p className="text-sm leading-[1.5] text-ink opacity-60">{subtitle}</p>
       </div>
       {selected && isInline && (
-        <span className="shrink-0 text-dark-sage">
+        <span className={`shrink-0 ${checkColor}`}>
           <CheckIcon />
         </span>
       )}
       {selected && !isInline && (
-        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-sage">
+        <span className={`absolute right-4 top-1/2 -translate-y-1/2 ${checkColor}`}>
           <CheckIcon />
         </span>
       )}

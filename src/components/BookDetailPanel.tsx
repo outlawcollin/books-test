@@ -1,17 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import type { BookData, DetailTabId } from "@/lib/types";
+import type { BookData, DetailTabId, ChatSession } from "@/lib/types";
 import DetailTabs from "./detail/DetailTabs";
 import PlayBookTab from "./detail/PlayBookTab";
+import BuildWorldTab from "./detail/BuildWorldTab";
+import PlaythroughsTab from "./detail/PlaythroughsTab";
 import CommunityRewrites from "./detail/CommunityRewrites";
 
 interface BookDetailPanelProps {
   book: BookData;
+  onStartChat?: (session: ChatSession) => void;
+  initialTab?: DetailTabId;
+  initialPremise?: string;
 }
 
-export default function BookDetailPanel({ book }: BookDetailPanelProps) {
-  const [activeTab, setActiveTab] = useState<DetailTabId>("play-book");
+export default function BookDetailPanel({ book, onStartChat, initialTab, initialPremise }: BookDetailPanelProps) {
+  const [activeTab, setActiveTab] = useState<DetailTabId>(initialTab ?? "play-book");
 
   return (
     <div className="flex h-full font-serif text-ink">
@@ -19,23 +24,11 @@ export default function BookDetailPanel({ book }: BookDetailPanelProps) {
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-4 md:p-6">
         <DetailTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {activeTab === "play-book" && <PlayBookTab book={book} />}
+        {activeTab === "play-book" && <PlayBookTab book={book} onStartChat={onStartChat} />}
 
-        {activeTab === "build-world" && (
-          <div className="flex flex-1 items-center justify-center">
-            <p className="font-serif text-base text-ink opacity-50">
-              Build on this world — coming soon.
-            </p>
-          </div>
-        )}
+        {activeTab === "build-world" && <BuildWorldTab book={book} onStartChat={onStartChat} initialPremise={initialPremise} />}
 
-        {activeTab === "playthroughs" && (
-          <div className="flex flex-1 items-center justify-center">
-            <p className="font-serif text-base text-ink opacity-50">
-              Your play throughs — coming soon.
-            </p>
-          </div>
-        )}
+        {activeTab === "playthroughs" && <PlaythroughsTab book={book} />}
       </div>
 
       {/* Divider + Community Rewrites — hidden below lg (1024px) */}

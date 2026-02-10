@@ -1,19 +1,12 @@
 "use client";
 
 import type { BookData } from "@/lib/types";
+import AllBooksIcon from "./icons/AllBooksIcon";
 
 interface BookInfoOverlayProps {
   book: BookData;
   onBack: () => void;
   className?: string;
-}
-
-function ArrowLeftIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M9.66782 18.082L4.37493 12.7892C3.9844 12.3986 3.9844 11.7655 4.37492 11.3749L9.66782 6.08203M4.91782 12.082H19.9178" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
 }
 
 export default function BookInfoOverlay({ book, onBack, className }: BookInfoOverlayProps) {
@@ -30,12 +23,12 @@ export default function BookInfoOverlay({ book, onBack, className }: BookInfoOve
         <button
           onClick={onBack}
           className="flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-[rgba(101,46,31,0.12)] text-espresso transition-colors hover:bg-cta/30"
-          aria-label="Go back"
+          aria-label="All books"
         >
-          <ArrowLeftIcon />
+          <AllBooksIcon />
         </button>
         <div className="flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-          <span className="text-xs leading-[1.5] text-espresso opacity-80">back</span>
+          <span className="text-xs leading-[1.5] text-espresso opacity-80">All books</span>
           <span className="rounded-[4.5px] bg-espresso px-1.5 py-1 font-mono text-xs leading-none tracking-tight text-pure-white">
             esc
           </span>

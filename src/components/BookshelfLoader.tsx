@@ -2,12 +2,13 @@
 
 import { type ReactNode, useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
-import type { BookData, TabId } from "@/lib/types";
+import type { BookData, TabId, DetailTabId, ChatSession } from "@/lib/types";
 import BookInfoOverlay from "./BookInfoOverlay";
 import BookDetailPanel from "./BookDetailPanel";
 import BookDropdown from "./detail/BookDropdown";
 import ShelfNav from "./ShelfNav";
 import AddBookModal, { type WebBook } from "./AddBookModal";
+import ChatPanel from "./chat/ChatPanel";
 
 const BookshelfCanvas = dynamic(
   () => import("@/components/BookshelfCanvas"),
@@ -55,13 +56,43 @@ export default function BookshelfLoader({
   const [activeTab, setActiveTab] = useState<TabId>("all-books");
   const [addBookOpen, setAddBookOpen] = useState(false);
   const [uploadingBooks, setUploadingBooks] = useState<WebBook[]>([]);
+  const [chatSession, setChatSession] = useState<ChatSession | null>(null);
+  const [initialDetailTab, setInitialDetailTab] = useState<DetailTabId | undefined>();
+  const [initialPremise, setInitialPremise] = useState<string | undefined>();
 
   const handleSelectBook = useCallback((book: BookData) => {
     setSelectedBook(book);
   }, []);
 
-  const handleBack = useCallback(() => {
+  const handleBackToShelf = useCallback(() => {
+    setChatSession(null);
     setSelectedBook(null);
+  }, []);
+
+  const handleBack = useCallback(() => {
+    if (chatSession) {
+      setChatSession(null);
+      return;
+    }
+    setSelectedBook(null);
+  }, [chatSession]);
+
+  const handleChatClose = useCallback((action: "finish" | "rewrite", premise?: string) => {
+    setChatSession(null);
+    if (action === "rewrite" && premise) {
+      setInitialDetailTab("build-world");
+      setInitialPremise(premise);
+    } else if (action === "finish") {
+      setInitialDetailTab("playthroughs");
+      setInitialPremise(undefined);
+    } else {
+      setInitialDetailTab(undefined);
+      setInitialPremise(undefined);
+    }
+  }, []);
+
+  const handleStartChat = useCallback((session: ChatSession) => {
+    setChatSession(session);
   }, []);
 
   const handleAddBook = useCallback(() => {
@@ -77,15 +108,15 @@ export default function BookshelfLoader({
     }, 3000);
   }, []);
 
-  // ESC key to close detail panel
+  // ESC key to close detail panel or chat
   useEffect(() => {
     if (!selectedBook) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelectedBook(null);
+      if (e.key === "Escape") handleBack();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedBook]);
+  }, [selectedBook, handleBack]);
 
   return (
     <main className="relative h-dvh w-dvw overflow-hidden bg-book-background">
@@ -141,28 +172,39 @@ export default function BookshelfLoader({
       {/* Detail overlay — fixed to cover entire viewport */}
       {selectedBook && (
         <div className="fixed inset-0 z-10 flex md:pointer-events-none max-md:flex-col max-md:overflow-y-auto max-md:bg-book-background">
-          {/* Mobile header: back button + book dropdown */}
-          <div className="shrink-0 border-b border-[rgba(62,39,51,0.12)] p-4 md:hidden" style={{ pointerEvents: "auto" }}>
-            <button
-              onClick={handleBack}
-              className="mb-4 flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-[rgba(101,46,31,0.12)] text-espresso"
-              aria-label="Go back"
-            >
-              <ArrowLeftIcon />
-            </button>
-            <BookDropdown book={selectedBook} />
-          </div>
+          {/* Mobile header: back button + book dropdown (hidden in chat) */}
+          {!chatSession && (
+            <div className="shrink-0 border-b border-[rgba(62,39,51,0.12)] p-4 md:hidden" style={{ pointerEvents: "auto" }}>
+              <button
+                onClick={handleBack}
+                className="mb-4 flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-[rgba(101,46,31,0.12)] text-espresso"
+                aria-label="Go back"
+              >
+                <ArrowLeftIcon />
+              </button>
+              <BookDropdown book={selectedBook} />
+            </div>
+          )}
 
           {/* Left info column + divider (hidden on mobile) */}
-          <BookInfoOverlay book={selectedBook} onBack={handleBack} className="max-md:hidden" />
+          <BookInfoOverlay book={selectedBook} onBack={handleBackToShelf} className="max-md:hidden" />
           <div className="w-px shrink-0 bg-[rgba(62,39,51,0.12)] max-md:hidden" />
 
-          {/* Content panel */}
+          {/* Content panel — swaps between detail tabs and chat */}
           <div
             className="flex-1 overflow-hidden bg-book-background"
             style={{ pointerEvents: "auto" }}
           >
-            <BookDetailPanel book={selectedBook} />
+            {chatSession ? (
+              <ChatPanel session={chatSession} book={selectedBook} onClose={handleChatClose} />
+            ) : (
+              <BookDetailPanel
+                book={selectedBook}
+                onStartChat={handleStartChat}
+                initialTab={initialDetailTab}
+                initialPremise={initialPremise}
+              />
+            )}
           </div>
         </div>
       )}

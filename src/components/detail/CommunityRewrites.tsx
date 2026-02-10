@@ -23,10 +23,10 @@ export default function CommunityRewrites({ book, className }: CommunityRewrites
   const rewrites = book.communityRewrites?.length
     ? book.communityRewrites
     : [
-        { premise: `${book.title} but set in modern-day New York City.` },
-        { premise: `${book.title} retold from the antagonist's perspective.` },
-        { premise: `${book.title} as a comedy where everything goes right.` },
-        { premise: `${book.title} reimagined as a sci-fi thriller.` },
+        { premise: "Set in modern-day New York City." },
+        { premise: "Retold from the antagonist's perspective." },
+        { premise: "A comedy where everything goes right." },
+        { premise: "Reimagined as a sci-fi thriller." },
       ];
 
   return (

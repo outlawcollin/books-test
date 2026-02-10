@@ -6,6 +6,7 @@ interface CharacterPickerProps {
   onSelect: (index: number) => void;
   onAddPersona?: () => void;
   persona?: { name: string; avatar: string } | null;
+  color?: "green" | "purple";
 }
 
 function CheckBadge() {
@@ -31,7 +32,10 @@ export default function CharacterPicker({
   onSelect,
   onAddPersona,
   persona,
+  color = "green",
 }: CharacterPickerProps) {
+  const accentBorder = color === "purple" ? "border-[#6b2e63]" : "border-dark-sage";
+  const accentText = color === "purple" ? "text-[#6b2e63]" : "text-dark-sage";
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -56,9 +60,9 @@ export default function CharacterPicker({
                   <img
                     src={persona.avatar}
                     alt={persona.name}
-                    className="size-[92px] rounded-full border-[1.5px] border-dark-sage object-cover shadow-[0px_4px_32px_rgba(62,39,51,0.04)]"
+                    className={`size-[92px] rounded-full border-[1.5px] ${accentBorder} object-cover shadow-[0px_4px_32px_rgba(62,39,51,0.04)]`}
                   />
-                  <span className="absolute -right-px -top-px text-dark-sage">
+                  <span className={`absolute -right-px -top-px ${accentText}`}>
                     <CheckBadge />
                   </span>
                 </div>
@@ -98,12 +102,12 @@ export default function CharacterPicker({
                       alt={name}
                       className={`size-[92px] rounded-full bg-ink object-cover shadow-[0px_4px_32px_rgba(62,39,51,0.04)] ${
                         isSelected
-                          ? "border-[1.5px] border-dark-sage"
+                          ? `border-[1.5px] ${accentBorder}`
                           : "border-[1.5px] border-[rgba(255,255,255,0.24)]"
                       }`}
                     />
                     {isSelected && (
-                      <span className="absolute -right-px -top-px text-dark-sage">
+                      <span className={`absolute -right-px -top-px ${accentText}`}>
                         <CheckBadge />
                       </span>
                     )}

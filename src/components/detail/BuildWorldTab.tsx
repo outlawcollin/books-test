@@ -3,28 +3,37 @@
 import { useState } from "react";
 import type { BookData, ChatSession, StoryInputMode } from "@/lib/types";
 import { BOOK_CHAT_MESSAGES } from "@/lib/mock-chat";
+import { BOOK_REWRITES } from "@/lib/rewrites";
 import CharacterPicker from "./CharacterPicker";
 import SelectionCard from "./SelectionCard";
 import PersonaModal, { type Persona } from "./PersonaModal";
 
-interface PlayBookTabProps {
+interface BuildWorldTabProps {
   book: BookData;
   onStartChat?: (session: ChatSession) => void;
+  initialPremise?: string;
 }
 
-export default function PlayBookTab({ book, onStartChat }: PlayBookTabProps) {
+const closePillIcon = (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <path d="M6.45801 6.45825L13.5413 13.5416M13.5413 6.45825L6.45801 13.5416" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export default function BuildWorldTab({ book, onStartChat, initialPremise }: BuildWorldTabProps) {
+  const suggestions = BOOK_REWRITES[book.id] ?? [];
   const [personaModalOpen, setPersonaModalOpen] = useState(false);
   const [selectedPersona, setSelectedPersona] = useState<Persona | null>(null);
   const characters = book.characters?.length
     ? book.characters
     : ["Protagonist", "Narrator", "Companion", "Rival", "Mentor"];
-
   const [selectedCharacter, setSelectedCharacter] = useState<number | null>(null);
-  const [storyMode, setStoryMode] = useState<string | null>(null);
+  const [selectedPill, setSelectedPill] = useState<number | null>(null);
   const [storyInput, setStoryInput] = useState<string | null>(null);
+  const [premiseText, setPremiseText] = useState(initialPremise ?? "");
 
   const hasCharacter = selectedCharacter !== null || selectedPersona !== null;
-  const isReady = hasCharacter && storyMode !== null && storyInput !== null;
+  const isReady = hasCharacter && storyInput !== null;
 
   return (
     <div className="flex flex-1 flex-col gap-6 max-md:pb-24">
@@ -35,31 +44,62 @@ export default function PlayBookTab({ book, onStartChat }: PlayBookTabProps) {
         onSelect={(i) => { setSelectedCharacter(i); setSelectedPersona(null); }}
         onAddPersona={() => setPersonaModalOpen(true)}
         persona={selectedPersona}
+        color="purple"
       />
 
-      {/* Story Mode */}
-      <div className="flex flex-col gap-4">
+      {/* Premise section */}
+      <div className="flex flex-1 flex-col gap-4">
         <div className="flex flex-col gap-1">
           <p className="font-serif text-base leading-[1.5] text-ink opacity-80">
-            Story mode
+            How will you rewrite this story?
           </p>
           <p className="font-serif text-sm leading-[1.5] text-ink opacity-60">
-            Select the storytelling style.
+            Leave your mark.
           </p>
         </div>
-        <div className="flex gap-1 max-lg:flex-col">
-          <SelectionCard
-            title="Book arc"
-            subtitle="Follow the story's narrative"
-            selected={storyMode === "book-arc"}
-            onClick={() => setStoryMode("book-arc")}
+
+        {/* Textarea card */}
+        <div className="flex flex-1 flex-col justify-between rounded-[20px] border border-[rgba(62,39,51,0.12)] bg-white p-5">
+          <textarea
+            value={premiseText}
+            onChange={(e) => setPremiseText(e.target.value)}
+            placeholder="Happy ending? Everyone's a robot?... Up to you."
+            className="flex-1 resize-none bg-transparent font-serif text-base leading-[1.3] text-ink outline-none placeholder:text-ink/60"
+            rows={4}
           />
-          <SelectionCard
-            title="Anything goes"
-            subtitle="Free-form roleplay"
-            selected={storyMode === "anything-goes"}
-            onClick={() => setStoryMode("anything-goes")}
-          />
+
+          <div className="flex flex-col gap-3 pt-4">
+            <p className="font-serif text-sm leading-[1.5] text-ink opacity-60">
+              Quick select:
+            </p>
+            <div className="relative">
+              <div className="flex max-h-[78px] flex-wrap gap-1.5 overflow-hidden max-lg:max-h-none max-lg:flex-nowrap max-lg:overflow-x-auto">
+                {suggestions.map((label, i) => {
+                  const isSelected = selectedPill === i;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedPill(isSelected ? null : i)}
+                      style={{ transition: "background-color 200ms ease-out, color 200ms ease-out" }}
+                      className={`flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full pl-6 pr-2 py-2 font-serif text-sm leading-[20px] ${
+                        isSelected
+                          ? "bg-[#6b2e63] text-white"
+                          : "bg-espresso/[0.06] text-espresso"
+                      }`}
+                    >
+                      {label}
+                      <span className={`inline-flex overflow-hidden transition-all duration-200 ease-out will-change-[transform,opacity,width] ${
+                        isSelected ? "w-5 opacity-100 scale-100" : "w-0 opacity-0 scale-50"
+                      }`}>
+                        {closePillIcon}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent lg:hidden" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -80,6 +120,7 @@ export default function PlayBookTab({ book, onStartChat }: PlayBookTabProps) {
             selected={storyInput === "text"}
             onClick={() => setStoryInput("text")}
             checkPosition="bottom-right"
+            color="purple"
           />
           <SelectionCard
             title="TapTale"
@@ -87,6 +128,7 @@ export default function PlayBookTab({ book, onStartChat }: PlayBookTabProps) {
             selected={storyInput === "taptale"}
             onClick={() => setStoryInput("taptale")}
             checkPosition="bottom-right"
+            color="purple"
           />
           <SelectionCard
             title="CardTale"
@@ -94,6 +136,7 @@ export default function PlayBookTab({ book, onStartChat }: PlayBookTabProps) {
             selected={storyInput === "cardtale"}
             onClick={() => setStoryInput("cardtale")}
             checkPosition="bottom-right"
+            color="purple"
           />
         </div>
       </div>
@@ -107,6 +150,7 @@ export default function PlayBookTab({ book, onStartChat }: PlayBookTabProps) {
           disabled={!isReady}
           onClick={() => {
             if (!isReady || !onStartChat) return;
+            const premise = premiseText.trim() || (selectedPill !== null ? suggestions[selectedPill] : undefined);
             const characterName = selectedPersona
               ? selectedPersona.name
               : characters[selectedCharacter!];
@@ -116,15 +160,16 @@ export default function PlayBookTab({ book, onStartChat }: PlayBookTabProps) {
               bookId: book.id,
               characterName,
               characterAvatar,
-              storyMode: storyMode!,
+              storyMode: "anything-goes",
               storyInput: storyInput as StoryInputMode,
+              premise,
               messages: BOOK_CHAT_MESSAGES[book.id] ?? [],
             });
           }}
           className={`w-full rounded-[44px] px-5 py-4 font-serif text-base transition-opacity ${
             isReady
-              ? "cursor-pointer bg-dark-sage text-pure-white hover:opacity-90"
-              : "cursor-not-allowed bg-dark-sage/40 text-pure-white/60"
+              ? "cursor-pointer bg-[#6b2e63] text-pure-white hover:opacity-90"
+              : "cursor-not-allowed bg-[#6b2e63]/40 text-pure-white/60"
           }`}
         >
           Dive in!
