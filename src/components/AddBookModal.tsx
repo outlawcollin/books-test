@@ -158,7 +158,7 @@ export default function AddBookModal({
         ref={modalRef}
         className="relative mx-4 flex w-full max-w-[460px] flex-col overflow-hidden rounded-[44px] border border-[rgba(62,39,51,0.12)] bg-book-background p-5"
         style={{
-          maxHeight: "80vh",
+          maxHeight: "70vh",
           boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.45)",
         }}
         tabIndex={-1}

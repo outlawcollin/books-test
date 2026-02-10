@@ -130,7 +130,7 @@ export default function BookshelfLoader({
       </div>
 
       {/* Bottom navigation — floating overlay at bottom */}
-      <div className="absolute inset-x-0 bottom-0 pb-3 md:pb-8">
+      <div className="absolute inset-x-0 bottom-0 pb-1 md:pb-8">
         <ShelfNav
           activeTab={activeTab}
           onTabChange={setActiveTab}

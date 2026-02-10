@@ -97,7 +97,7 @@ export default function PlayBookTab({ book }: PlayBookTabProps) {
       <div className="flex-1 max-md:hidden" />
 
       {/* CTA — fixed at bottom on mobile */}
-      <div className="max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:border-t max-md:border-[rgba(62,39,51,0.12)] max-md:bg-book-background max-md:px-4 max-md:pt-4 max-md:pb-[env(safe-area-inset-bottom)]">
+      <div className="max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:border-t max-md:border-[rgba(62,39,51,0.12)] max-md:bg-book-background max-md:px-4 max-md:pt-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]">
         <button className="w-full cursor-pointer rounded-[44px] bg-dark-sage px-5 py-4 font-serif text-base text-pure-white transition-opacity hover:opacity-90">
           Dive in!
         </button>
