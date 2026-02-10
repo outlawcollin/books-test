@@ -140,7 +140,7 @@ export default function BookshelfLoader({
 
       {/* Detail overlay — fixed to cover entire viewport */}
       {selectedBook && (
-        <div className="fixed inset-0 z-10 flex md:pointer-events-none max-md:flex-col max-md:overflow-y-auto max-md:bg-book-background">
+        <div className="fixed inset-0 z-10 flex overflow-x-hidden md:pointer-events-none max-md:flex-col max-md:overflow-y-auto max-md:bg-book-background">
           {/* Mobile header: back button + book dropdown */}
           <div className="shrink-0 px-4 pt-4 md:hidden" style={{ pointerEvents: "auto" }}>
             {/* <button
