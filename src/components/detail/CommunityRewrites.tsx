@@ -1,4 +1,3 @@
-import { PaperTexture } from "@paper-design/shaders-react";
 import type { BookData } from "@/lib/types";
 
 interface CommunityRewritesProps {
@@ -54,14 +53,6 @@ export default function CommunityRewrites({ book, className }: CommunityRewrites
               className="flex w-[172px] cursor-pointer flex-col items-center gap-3 text-center"
             >
               <div className="relative h-[172px] w-[124px] overflow-hidden border border-ink/8 shadow-sm">
-                <PaperTexture
-                  contrast={0.15} roughness={0.3} fiber={0.2} fiberSize={0.15}
-                  crumples={0.1} crumpleSize={0.15} folds={0.15} foldCount={3}
-                  fade={0} drops={0.02} seed={3.2 + i} scale={0.5}
-                  colorBack="#00000000" colorFront="#3e273315"
-                  className="pointer-events-none absolute inset-0"
-                  style={{ backgroundColor: "#f4f0e9" }}
-                />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={book.coverImage || book.coverImageFallback}
