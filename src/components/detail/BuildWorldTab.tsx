@@ -143,7 +143,7 @@ export default function BuildWorldTab({ book, onStartChat, initialRewrite, onCle
                       ? { transition: "background-color 200ms ease-out, color 200ms ease-out" }
                       : { background: "linear-gradient(110deg, #652e1f 30%, #8a4a38 50%, #652e1f 70%)", backgroundSize: "200% 100%", animation: "shimmer-pill 8.4s linear infinite" }
                     }
-                    className={`flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full pl-6 pr-2 py-2 font-serif text-sm leading-[20px] ${
+                    className={`flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full pl-4 pr-2 py-2 font-serif text-sm leading-[20px] ${
                       isSelected
                         ? "bg-[#6b2e63] text-white"
                         : "text-white"
