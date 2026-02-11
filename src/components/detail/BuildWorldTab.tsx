@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { BookData, ChatSession, StoryInputMode } from "@/lib/types";
+import type { BookData, ChatSession, StoryInputMode, RewriteData } from "@/lib/types";
 import { BOOK_CHAT_MESSAGES } from "@/lib/mock-chat";
 import { BOOK_REWRITES } from "@/lib/rewrites";
 import CharacterPicker from "./CharacterPicker";
@@ -11,7 +11,8 @@ import PersonaModal, { type Persona } from "./PersonaModal";
 interface BuildWorldTabProps {
   book: BookData;
   onStartChat?: (session: ChatSession) => void;
-  initialPremise?: string;
+  initialRewrite?: RewriteData;
+  onClearRewrite?: () => void;
 }
 
 const closePillIcon = (
@@ -20,20 +21,44 @@ const closePillIcon = (
   </svg>
 );
 
-export default function BuildWorldTab({ book, onStartChat, initialPremise }: BuildWorldTabProps) {
+function findCharacterIndex(characters: string[], name?: string): number | null {
+  if (!name) return null;
+  const idx = characters.findIndex((c) => c === name);
+  return idx >= 0 ? idx : null;
+}
+
+export default function BuildWorldTab({ book, onStartChat, initialRewrite, onClearRewrite }: BuildWorldTabProps) {
   const suggestions = BOOK_REWRITES[book.id] ?? [];
-  const [personaModalOpen, setPersonaModalOpen] = useState(false);
-  const [selectedPersona, setSelectedPersona] = useState<Persona | null>(null);
   const characters = book.characters?.length
     ? book.characters
     : ["Protagonist", "Narrator", "Companion", "Rival", "Mentor"];
-  const [selectedCharacter, setSelectedCharacter] = useState<number | null>(null);
+
+  const [personaModalOpen, setPersonaModalOpen] = useState(false);
+  const [selectedPersona, setSelectedPersona] = useState<Persona | null>(null);
+  const [selectedCharacter, setSelectedCharacter] = useState<number | null>(
+    findCharacterIndex(characters, initialRewrite?.characterName)
+  );
   const [selectedPill, setSelectedPill] = useState<number | null>(null);
-  const [storyInput, setStoryInput] = useState<string | null>(null);
-  const [premiseText, setPremiseText] = useState(initialPremise ?? "");
+  const [storyInput, setStoryInput] = useState<string | null>(
+    initialRewrite?.storyInput ?? null
+  );
+  const [premiseText, setPremiseText] = useState(initialRewrite?.premise ?? "");
+  const [activeRewrite, setActiveRewrite] = useState<RewriteData | null>(initialRewrite ?? null);
 
   const hasCharacter = selectedCharacter !== null || selectedPersona !== null;
   const isReady = hasCharacter && storyInput !== null;
+
+  const coverSrc = book.coverImage || book.coverImageFallback;
+
+  const clearRewrite = () => {
+    setActiveRewrite(null);
+    setPremiseText("");
+    setSelectedCharacter(null);
+    setSelectedPersona(null);
+    setStoryInput(null);
+    setSelectedPill(null);
+    onClearRewrite?.();
+  };
 
   return (
     <div className="flex flex-1 flex-col gap-6 max-md:pb-24">
@@ -60,20 +85,48 @@ export default function BuildWorldTab({ book, onStartChat, initialPremise }: Bui
 
         {/* Textarea card */}
         <div className="flex flex-1 flex-col justify-between rounded-[20px] border border-[rgba(62,39,51,0.12)] bg-white/60 p-5">
-          <textarea
-            value={premiseText}
-            onChange={(e) => setPremiseText(e.target.value)}
-            placeholder="Happy ending? Everyone's a robot?... Up to you."
-            className="flex-1 resize-none bg-transparent font-serif text-base leading-[1.3] text-ink outline-none placeholder:text-ink/60"
-            rows={4}
-          />
+          {/* Cover card + textarea row (desktop: side-by-side, mobile: stacked) */}
+          <div className="flex flex-1 flex-col gap-4">
+            {/* Mini rewrite cover card */}
+            {activeRewrite && coverSrc && (
+              <div className="relative inline-block self-start">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={coverSrc}
+                  alt={book.title}
+                  className="h-[110px] w-[80px] rounded-sm border border-ink/8 object-cover shadow-sm"
+                  style={{ backgroundColor: book.spineColor ?? "#1a1a2e" }}
+                />
+                <button
+                  onClick={clearRewrite}
+                  className="absolute -right-2 -top-2 flex size-6 cursor-pointer items-center justify-center rounded-full bg-ink text-pure-white shadow-sm transition-opacity hover:opacity-80"
+                  aria-label="Clear rewrite"
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 3L9 9M9 3L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            <textarea
+              value={premiseText}
+              onChange={(e) => setPremiseText(e.target.value)}
+              placeholder="Happy ending? Everyone's a robot?... Up to you."
+              className="flex-1 resize-none bg-transparent font-serif text-base leading-[1.3] text-ink outline-none placeholder:text-ink/60"
+              rows={4}
+            />
+          </div>
 
           <div className="flex flex-col gap-3 pt-4">
             <p className="font-serif text-sm leading-[1.5] text-ink opacity-60">
               Quick select:
             </p>
-            <div className="relative">
-              <div className="flex max-h-[78px] flex-wrap gap-1.5 overflow-hidden max-lg:max-h-none max-lg:flex-nowrap max-lg:overflow-x-auto">
+            <div
+              className="relative"
+              style={{ maskImage: "linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent)" }}
+            >
+              <div className="flex gap-1.5 flex-nowrap overflow-x-auto scrollbar-hide">
                 {suggestions.map((label, i) => {
                   const isSelected = selectedPill === i;
                   return (
@@ -97,7 +150,6 @@ export default function BuildWorldTab({ book, onStartChat, initialPremise }: Bui
                   );
                 })}
               </div>
-              <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent lg:hidden" />
             </div>
           </div>
         </div>
@@ -172,7 +224,7 @@ export default function BuildWorldTab({ book, onStartChat, initialPremise }: Bui
               : "cursor-not-allowed bg-[#6b2e63]/40 text-pure-white/60"
           }`}
         >
-          Dive in!
+          AU this!
         </button>
       </div>
       <PersonaModal

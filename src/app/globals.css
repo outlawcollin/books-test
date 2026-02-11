@@ -160,6 +160,10 @@ body {
 /* Hide below lg (1024px) — uses MQ3 syntax for Safari compatibility
    (Tailwind's max-lg: compiles to MQ4 `not (min-width)` which Safari
    doesn't handle correctly inside @layer) */
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
 @media (max-width: 1023px) {
   .hide-below-lg {
     display: none !important;

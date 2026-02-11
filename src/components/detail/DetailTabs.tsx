@@ -36,7 +36,7 @@ function BookmarkIcon() {
 
 const TABS: { id: DetailTabId; label: string; Icon: () => React.JSX.Element }[] = [
   { id: "play-book", label: "Play book", Icon: HorizonIcon },
-  { id: "build-world", label: "Build on this world", Icon: MagicEditIcon },
+  { id: "build-world", label: "AU this!", Icon: MagicEditIcon },
   { id: "playthroughs", label: "Your play throughs", Icon: BookmarkIcon },
 ];
 

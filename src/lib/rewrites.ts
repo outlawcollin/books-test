@@ -1,3 +1,54 @@
+import type { RewriteData } from "./types";
+
+/** Community rewrites with full data (character, story input) — used by sidebar + EndBookScreen. */
+export const COMMUNITY_REWRITES: Record<string, RewriteData[]> = {
+  "84": [
+    { premise: "The Creature writes a memoir about learning what it means to be human.", characterName: "The Creature", storyInput: "text" },
+    { premise: "Victor checks into a sanatorium and confronts his obsession.", characterName: "Victor Frankenstein", storyInput: "taptale" },
+    { premise: "Set aboard a deep-space research vessel where the experiment goes wrong.", characterName: "Robert Walton", storyInput: "cardtale" },
+    { premise: "The Creature opens a bakery in a small village and tries to fit in.", characterName: "The Creature", storyInput: "taptale" },
+  ],
+  "2701": [
+    { premise: "Ahab and the white whale form an unlikely alliance against whalers.", characterName: "Captain Ahab", storyInput: "text" },
+    { premise: "Ishmael starts a podcast documenting life aboard the Pequod.", characterName: "Ishmael", storyInput: "taptale" },
+    { premise: "The Pequod becomes a luxury cruise ship with a dark secret below deck.", characterName: "Starbuck", storyInput: "cardtale" },
+    { premise: "The whale tells the story from beneath the waves.", characterName: "Ishmael", storyInput: "text" },
+  ],
+  "1342": [
+    { premise: "Darcy is a tech billionaire and Elizabeth is a journalist investigating him.", characterName: "Elizabeth Bennet", storyInput: "text" },
+    { premise: "Elizabeth starts a book club that accidentally changes Meryton forever.", characterName: "Elizabeth Bennet", storyInput: "taptale" },
+    { premise: "Wickham runs for Parliament and Darcy has to stop him.", characterName: "Mr. Darcy", storyInput: "cardtale" },
+    { premise: "The Bennets win the lottery and chaos ensues.", characterName: "Lydia Bennet", storyInput: "taptale" },
+  ],
+  "1513": [
+    { premise: "Juliet is a tech genius princess who hacks the family feud.", characterName: "Juliet", storyInput: "text" },
+    { premise: "A massive masquerade in zero gravity where nobody knows who's who.", characterName: "Romeo", storyInput: "cardtale" },
+    { premise: "Fake death using experimental sleep technology goes sideways.", characterName: "Juliet", storyInput: "taptale" },
+    { premise: "Benvolio tries desperately to get everyone to calm down.", characterName: "Mercutio", storyInput: "taptale" },
+  ],
+  "11": [
+    { premise: "Alice decides to stay in Wonderland and build a life there.", characterName: "Alice", storyInput: "text" },
+    { premise: "The Queen of Hearts has a change of heart and reforms Wonderland.", characterName: "The Queen of Hearts", storyInput: "taptale" },
+    { premise: "The Cheshire Cat narrates the story from the shadows.", characterName: "The Cheshire Cat", storyInput: "cardtale" },
+    { premise: "The Mad Hatter opens a cafe and all of Wonderland comes for tea.", characterName: "The Mad Hatter", storyInput: "taptale" },
+  ],
+  "1260": [
+    { premise: "Bertha Mason finally tells her own story.", characterName: "Jane Eyre", storyInput: "text" },
+    { premise: "Jane inherits Rochester's estate and runs it her own way.", characterName: "Jane Eyre", storyInput: "taptale" },
+    { premise: "Set in a modern boarding school with dark secrets.", characterName: "Jane Eyre", storyInput: "cardtale" },
+  ],
+  "2554": [
+    { premise: "Raskolnikov starts a true crime podcast about his own case.", characterName: "Raskolnikov", storyInput: "text" },
+    { premise: "Sonya becomes a defense lawyer and takes on impossible cases.", characterName: "Sonya Marmeladova", storyInput: "taptale" },
+    { premise: "The detective is actually wrong about everything.", characterName: "Porfiry Petrovich", storyInput: "cardtale" },
+  ],
+  "37106": [
+    { premise: "Jo March goes to Hollywood to write screenplays.", characterName: "Jo March", storyInput: "text" },
+    { premise: "Beth survives her illness and becomes a concert pianist.", characterName: "Beth March", storyInput: "taptale" },
+    { premise: "Amy opens an art gallery in Paris and the family visits.", characterName: "Amy March", storyInput: "cardtale" },
+  ],
+};
+
 /** Book-specific "rewrite" suggestion pills for the Build World tab (by Gutenberg book ID). */
 export const BOOK_REWRITES: Record<string, string[]> = {
   "84": [

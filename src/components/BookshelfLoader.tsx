@@ -2,13 +2,14 @@
 
 import { type ReactNode, useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
-import type { BookData, TabId, DetailTabId, ChatSession } from "@/lib/types";
+import type { BookData, TabId, DetailTabId, ChatSession, RewriteData } from "@/lib/types";
 import BookInfoOverlay from "./BookInfoOverlay";
 import BookDetailPanel from "./BookDetailPanel";
 import BookDropdown from "./detail/BookDropdown";
 import ShelfNav from "./ShelfNav";
 import AddBookModal, { type WebBook } from "./AddBookModal";
 import ChatPanel from "./chat/ChatPanel";
+import AllBooksIcon from "./icons/AllBooksIcon";
 
 
 const BookshelfCanvas = dynamic(
@@ -36,14 +37,6 @@ const EMPTY_MESSAGES: Record<Exclude<TabId, "all-books">, string> = {
   "my-copies": "No uploaded copies yet.",
 };
 
-function ArrowLeftIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M9.66782 18.082L4.37493 12.7892C3.9844 12.3986 3.9844 11.7655 4.37492 11.3749L9.66782 6.08203M4.91782 12.082H19.9178" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 interface BookshelfLoaderProps {
   books: BookData[];
   children?: ReactNode;
@@ -59,7 +52,7 @@ export default function BookshelfLoader({
   const [uploadingBooks, setUploadingBooks] = useState<WebBook[]>([]);
   const [chatSession, setChatSession] = useState<ChatSession | null>(null);
   const [initialDetailTab, setInitialDetailTab] = useState<DetailTabId | undefined>();
-  const [initialPremise, setInitialPremise] = useState<string | undefined>();
+  const [initialRewrite, setInitialRewrite] = useState<RewriteData | undefined>();
   const [spacerCenterY, setSpacerCenterY] = useState<number | null>(null);
   const [localBooks, setLocalBooks] = useState<BookData[]>([]);
 
@@ -80,17 +73,17 @@ export default function BookshelfLoader({
     setSelectedBook(null);
   }, [chatSession]);
 
-  const handleChatClose = useCallback((action: "finish" | "rewrite", premise?: string) => {
+  const handleChatClose = useCallback((action: "finish" | "rewrite", rewrite?: RewriteData) => {
     setChatSession(null);
-    if (action === "rewrite" && premise) {
+    if (action === "rewrite" && rewrite) {
       setInitialDetailTab("build-world");
-      setInitialPremise(premise);
+      setInitialRewrite(rewrite);
     } else if (action === "finish") {
       setInitialDetailTab("playthroughs");
-      setInitialPremise(undefined);
+      setInitialRewrite(undefined);
     } else {
       setInitialDetailTab(undefined);
-      setInitialPremise(undefined);
+      setInitialRewrite(undefined);
     }
   }, []);
 
@@ -130,57 +123,52 @@ export default function BookshelfLoader({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [selectedBook, handleBack]);
 
+  // Compute filtered books once — shared by canvas, nav arrows, and empty state
+  const allBooks = [...localBooks, ...books];
+  const filtered =
+    activeTab === "my-copies" ? allBooks.filter((b) => b.isMyCopy) :
+    activeTab === "in-progress" ? allBooks.filter((b) => b.hasPlaythrough) :
+    allBooks;
+
+  // Canvas gets loading placeholders prepended
+  const canvasBooks = (activeTab === "my-copies" && uploadingBooks.length > 0)
+    ? [
+        ...uploadingBooks.map((wb): BookData => ({
+          id: `loading-${wb.id}`,
+          title: wb.title,
+          author: wb.source,
+          isMyCopy: true,
+          isLoading: true,
+          spineColor: "#d4cec6",
+        })),
+        ...filtered,
+      ]
+    : filtered;
+
+  // Book navigation (for mobile prev/next arrows)
+  const selectedIndex = selectedBook ? filtered.findIndex((b) => b.id === selectedBook.id) : -1;
+  const hasPrev = selectedIndex > 0;
+  const hasNext = selectedIndex >= 0 && selectedIndex < filtered.length - 1;
+
   return (
     <main className="relative h-dvh w-dvw overflow-hidden bg-book-background">
 
       {/* Canvas — full viewport, filtered by active tab */}
-      {(() => {
-        const allBooks = [...localBooks, ...books];
-        let filtered =
-          activeTab === "my-copies" ? allBooks.filter((b) => b.isMyCopy) :
-          activeTab === "in-progress" ? allBooks.filter((b) => b.hasPlaythrough) :
-          allBooks;
-
-        // Prepend loading placeholders so BookGroup positions them at center,
-        // pushing existing books to the right
-        if (activeTab === "my-copies" && uploadingBooks.length > 0) {
-          const loadingBooks: BookData[] = uploadingBooks.map((wb) => ({
-            id: `loading-${wb.id}`,
-            title: wb.title,
-            author: wb.source,
-            isMyCopy: true,
-            isLoading: true,
-            spineColor: "#d4cec6",
-          }));
-          filtered = [...loadingBooks, ...filtered];
-        }
-
-        return (
-          <BookshelfCanvas
-            books={filtered}
-            onSelectBook={handleSelectBook}
-            selectedBook={selectedBook}
-            spacerCenterY={spacerCenterY}
-          />
-        );
-      })()}
+      <BookshelfCanvas
+        books={canvasBooks}
+        onSelectBook={handleSelectBook}
+        selectedBook={selectedBook}
+        spacerCenterY={spacerCenterY}
+      />
 
       {/* Empty tab message — overlay so canvas stays mounted */}
-      {(() => {
-        if (activeTab === "all-books" || selectedBook) return null;
-        const allBooks = [...localBooks, ...books];
-        const filtered =
-          activeTab === "my-copies" ? allBooks.filter((b) => b.isMyCopy) :
-          allBooks.filter((b) => b.hasPlaythrough);
-        if (filtered.length > 0 || uploadingBooks.length > 0) return null;
-        return (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-            <p className="font-serif text-base text-ink opacity-50">
-              {EMPTY_MESSAGES[activeTab]}
-            </p>
-          </div>
-        );
-      })()}
+      {activeTab !== "all-books" && !selectedBook && filtered.length === 0 && uploadingBooks.length === 0 && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <p className="font-serif text-base text-ink opacity-50">
+            {EMPTY_MESSAGES[activeTab]}
+          </p>
+        </div>
+      )}
 
       {/* Upload shimmer overlay — shows while a book is being added */}
       {activeTab === "my-copies" && uploadingBooks.length > 0 && (
@@ -224,16 +212,40 @@ export default function BookshelfLoader({
       {/* Detail overlay — fixed to cover entire viewport */}
       {selectedBook && (
         <div className="fixed inset-0 z-10 flex md:pointer-events-none max-md:flex-col max-md:overflow-y-auto max-md:bg-book-background">
-          {/* Mobile header: back button + book dropdown (hidden in chat) */}
+          {/* Mobile header: back button + nav arrows + book dropdown (hidden in chat) */}
           {!chatSession && (
             <div className="shrink-0 border-b border-[rgba(62,39,51,0.12)] p-4 md:hidden" style={{ pointerEvents: "auto" }}>
-              <button
-                onClick={handleBack}
-                className="mb-4 flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-[rgba(101,46,31,0.12)] text-espresso"
-                aria-label="Go back"
-              >
-                <ArrowLeftIcon />
-              </button>
+              <div className="mb-4 flex items-center justify-between">
+                <button
+                  onClick={handleBack}
+                  className="flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-[rgba(101,46,31,0.12)] text-espresso"
+                  aria-label="All books"
+                >
+                  <AllBooksIcon />
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => hasPrev && setSelectedBook(filtered[selectedIndex - 1])}
+                    disabled={!hasPrev}
+                    className="flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-[rgba(101,46,31,0.12)] text-espresso transition-opacity disabled:cursor-default disabled:opacity-30"
+                    aria-label="Previous book"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path d="M11 4L6 9L11 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => hasNext && setSelectedBook(filtered[selectedIndex + 1])}
+                    disabled={!hasNext}
+                    className="flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-[rgba(101,46,31,0.12)] text-espresso transition-opacity disabled:cursor-default disabled:opacity-30"
+                    aria-label="Next book"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path d="M7 4L12 9L7 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
               <BookDropdown book={selectedBook} />
             </div>
           )}
@@ -254,7 +266,7 @@ export default function BookshelfLoader({
                 book={selectedBook}
                 onStartChat={handleStartChat}
                 initialTab={initialDetailTab}
-                initialPremise={initialPremise}
+                initialRewrite={initialRewrite}
               />
             )}
           </div>

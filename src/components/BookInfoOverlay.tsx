@@ -17,7 +17,9 @@ export default function BookInfoOverlay({ book, onBack, onSpacerMeasure, classNa
   const measure = useCallback(() => {
     if (!spacerRef.current || !onSpacerMeasure) return;
     const rect = spacerRef.current.getBoundingClientRect();
-    onSpacerMeasure(rect.top + rect.height / 2);
+    if (rect.height > 0) {
+      onSpacerMeasure(rect.top + rect.height / 2);
+    }
   }, [onSpacerMeasure]);
 
   useLayoutEffect(() => {
@@ -48,7 +50,7 @@ export default function BookInfoOverlay({ book, onBack, onSpacerMeasure, classNa
         </button>
         <div className="flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
           <span className="text-xs leading-[1.5] text-espresso opacity-80">All books</span>
-          <span className="rounded-[4.5px] bg-espresso px-1.5 py-1 font-mono text-xs leading-none tracking-tight text-pure-white">
+          <span className="rounded-[4.5px] bg-espresso px-1.5 py-1 font-serif text-xs leading-none tracking-tight text-pure-white">
             esc
           </span>
         </div>

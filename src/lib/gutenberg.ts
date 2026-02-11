@@ -1,6 +1,7 @@
 import type { BookData } from "@/lib/types";
 import { BOOK_CHARACTERS } from "@/lib/characters";
 import { BOOK_DESCRIPTIONS } from "@/lib/descriptions";
+import { COMMUNITY_REWRITES } from "@/lib/rewrites";
 
 interface GutenbergAuthor {
   name: string;
@@ -89,7 +90,7 @@ export async function fetchGutenbergBooks(count: number): Promise<BookData[]> {
         publishedYear,
         chapters: [],
         characters: BOOK_CHARACTERS[String(book.id)] || [],
-        communityRewrites: [],
+        communityRewrites: COMMUNITY_REWRITES[String(book.id)] ?? [],
         hasPlaythrough: i === 0 || i === 2 || i === 4,
         isMyCopy: false,
       };

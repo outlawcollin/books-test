@@ -1,7 +1,8 @@
-import type { BookData } from "@/lib/types";
+import type { BookData, RewriteData } from "@/lib/types";
 
 interface CommunityRewritesProps {
   book: BookData;
+  onSelectRewrite?: (rewrite: RewriteData) => void;
   className?: string;
 }
 
@@ -14,7 +15,7 @@ function InfoCircleIcon() {
   );
 }
 
-export default function CommunityRewrites({ book, className }: CommunityRewritesProps) {
+export default function CommunityRewrites({ book, onSelectRewrite, className }: CommunityRewritesProps) {
   const rewrites = book.communityRewrites?.length
     ? book.communityRewrites
     : [
@@ -34,7 +35,7 @@ export default function CommunityRewrites({ book, className }: CommunityRewrites
             <span className="opacity-50 group-hover:opacity-100">
               <InfoCircleIcon />
             </span>
-            <span className="pointer-events-none invisible absolute left-1/2 top-full z-10 mt-1 w-[160px] -translate-x-1/2 rounded-lg bg-book-background px-3 py-2 text-center font-serif text-xs leading-[1.4] text-espresso drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)] group-hover:visible">
+            <span className="pointer-events-none invisible absolute left-1/2 top-full z-10 mt-1 w-[160px] -translate-x-1/2 rounded-lg bg-book-background px-3 py-2 text-center font-serif text-xs leading-[1.4] text-ink drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)] group-hover:visible">
               Community-created alternate versions of this story
             </span>
           </div>
@@ -48,9 +49,10 @@ export default function CommunityRewrites({ book, className }: CommunityRewrites
       >
         <div className="flex flex-col items-center gap-8 px-6 pb-6 pt-3">
           {rewrites.map((rewrite, i) => (
-            <div
+            <button
               key={i}
-              className="flex w-[172px] cursor-pointer flex-col items-center gap-3 text-center"
+              onClick={() => onSelectRewrite?.(rewrite)}
+              className="flex w-[172px] cursor-pointer flex-col items-center gap-3 text-center transition-opacity hover:opacity-70"
             >
               <div className="relative h-[172px] w-[124px] overflow-hidden border border-ink/8 shadow-sm">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -61,10 +63,10 @@ export default function CommunityRewrites({ book, className }: CommunityRewrites
                   style={{ backgroundColor: book.spineColor ?? "#1a1a2e" }}
                 />
               </div>
-              <p className="text-xs leading-[1.4] text-pure-black">
+              <p className="text-xs leading-[1.4] text-ink">
                 {rewrite.premise}
               </p>
-            </div>
+            </button>
           ))}
         </div>
       </div>

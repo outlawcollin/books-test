@@ -30,6 +30,7 @@ export default function BookGroup({ books, onSelectBook, selectedBook, spacerCen
   const [activeIndex, setActiveIndex] = useState(0);
   const activeRef = useRef(0);
   const initialized = useRef(false);
+  const wasInDetail = useRef(false);
 
   const bookRefs = useMemo(
     () => books.map(() => createRef<Group>()),
@@ -64,6 +65,10 @@ export default function BookGroup({ books, onSelectBook, selectedBook, spacerCen
       : 0;
 
     const inDetail = selectedBook && selectedIndex >= 0;
+    const isMobile = size.width < 768;
+    // Detect transition from detail → shelf on mobile — snap instead of lerping
+    const mobileSnap = wasInDetail.current && !inDetail && isMobile;
+    wasInDetail.current = !!inDetail;
 
     for (let i = 0; i < total; i++) {
       const ref = bookRefs[i]?.current;
@@ -112,7 +117,8 @@ export default function BookGroup({ books, onSelectBook, selectedBook, spacerCen
         const targetX = (i - clamped) * BOOK_SPACING + spreadOffset;
         const targetZ = isActive ? 0.8 : 0;
 
-        if (!initialized.current) {
+        if (!initialized.current || mobileSnap) {
+          // Snap immediately on init or mobile detail exit
           ref.position.x = targetX;
           ref.position.y = 0;
           ref.position.z = targetZ;
@@ -124,9 +130,13 @@ export default function BookGroup({ books, onSelectBook, selectedBook, spacerCen
 
         // Restore scale for books returning from detail mode
         if (ref.scale.x < 0.99) {
-          const s = MathUtils.lerp(ref.scale.x, 1, 0.1);
-          ref.scale.set(s, s, s);
-          if (s > 0.99) ref.scale.set(1, 1, 1);
+          if (mobileSnap) {
+            ref.scale.set(1, 1, 1);
+          } else {
+            const s = MathUtils.lerp(ref.scale.x, 1, 0.1);
+            ref.scale.set(s, s, s);
+            if (s > 0.99) ref.scale.set(1, 1, 1);
+          }
         }
 
         // Restore opacity for books returning from detail mode
@@ -135,10 +145,15 @@ export default function BookGroup({ books, onSelectBook, selectedBook, spacerCen
           if ("text" in child) return;
           const mesh = child as { isMesh?: boolean; material?: { transparent: boolean; opacity: number } };
           if (mesh.isMesh && mesh.material && mesh.material.opacity < 1) {
-            mesh.material.opacity = MathUtils.lerp(mesh.material.opacity, 1, 0.1);
-            if (mesh.material.opacity > 0.99) {
+            if (mobileSnap) {
               mesh.material.opacity = 1;
               mesh.material.transparent = false;
+            } else {
+              mesh.material.opacity = MathUtils.lerp(mesh.material.opacity, 1, 0.1);
+              if (mesh.material.opacity > 0.99) {
+                mesh.material.opacity = 1;
+                mesh.material.transparent = false;
+              }
             }
           }
         });

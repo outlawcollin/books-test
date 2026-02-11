@@ -1,10 +1,10 @@
-import type { BookData } from "@/lib/types";
+import type { BookData, RewriteData } from "@/lib/types";
 
 interface EndBookScreenProps {
   book: BookData;
   onKeepPlaying: () => void;
   onFinish: () => void;
-  onSelectRewrite: (premise: string) => void;
+  onSelectRewrite: (rewrite: RewriteData) => void;
 }
 
 export default function EndBookScreen({ book, onKeepPlaying, onFinish, onSelectRewrite }: EndBookScreenProps) {
@@ -59,7 +59,7 @@ export default function EndBookScreen({ book, onKeepPlaying, onFinish, onSelectR
             {displayRewrites.map((rewrite, i) => (
               <button
                 key={i}
-                onClick={() => onSelectRewrite(rewrite.premise)}
+                onClick={() => onSelectRewrite(rewrite)}
                 className="flex w-[172px] cursor-pointer flex-col items-center gap-3 text-center max-md:w-auto"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}

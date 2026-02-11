@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import type { ChatSession, ChatMessage, BookData } from "@/lib/types";
+import type { ChatSession, ChatMessage, BookData, RewriteData } from "@/lib/types";
 import ChatBubble from "./ChatBubble";
 import ChatInput from "./ChatInput";
 import EndBookScreen from "./EndBookScreen";
@@ -17,7 +17,7 @@ function ShareIcon() {
 interface ChatPanelProps {
   session: ChatSession;
   book: BookData;
-  onClose: (action: "finish" | "rewrite", premise?: string) => void;
+  onClose: (action: "finish" | "rewrite", rewrite?: RewriteData) => void;
 }
 
 export default function ChatPanel({ session, book, onClose }: ChatPanelProps) {
@@ -44,7 +44,7 @@ export default function ChatPanel({ session, book, onClose }: ChatPanelProps) {
         book={book}
         onKeepPlaying={() => setShowEndScreen(false)}
         onFinish={() => onClose("finish")}
-        onSelectRewrite={(premise) => onClose("rewrite", premise)}
+        onSelectRewrite={(rewrite) => onClose("rewrite", rewrite)}
       />
     );
   }
