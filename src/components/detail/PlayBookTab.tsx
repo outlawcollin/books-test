@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { BookData, ChatSession, StoryInputMode } from "@/lib/types";
 import { BOOK_CHAT_MESSAGES } from "@/lib/mock-chat";
+import { getCharacterAvatar } from "@/lib/character-avatars";
 import CharacterPicker from "./CharacterPicker";
 import SelectionCard from "./SelectionCard";
 import PersonaModal, { type Persona } from "./PersonaModal";
@@ -111,7 +112,7 @@ export default function PlayBookTab({ book, onStartChat }: PlayBookTabProps) {
               ? selectedPersona.name
               : characters[selectedCharacter!];
             const characterAvatar = selectedPersona?.avatar
-              ?? `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(characterName)}&size=184`;
+              ?? getCharacterAvatar(characterName);
             onStartChat({
               bookId: book.id,
               characterName,

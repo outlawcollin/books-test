@@ -147,6 +147,18 @@ body {
   }
 }
 
+@keyframes shimmer-pill {
+  0% {
+    background-position: 200% 0;
+  }
+  29% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 /* Hide scrollbars from Drei ScrollControls */
 *::-webkit-scrollbar {
   display: none !important;

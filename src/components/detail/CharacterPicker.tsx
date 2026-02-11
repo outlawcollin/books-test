@@ -1,5 +1,7 @@
 "use client";
 
+import { getCharacterAvatar } from "@/lib/character-avatars";
+
 interface CharacterPickerProps {
   characters: string[];
   selectedIndex: number | null;
@@ -100,7 +102,7 @@ export default function CharacterPicker({
                 >
                   <div className="relative">
                     <img
-                      src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(name)}&size=184`}
+                      src={getCharacterAvatar(name)}
                       alt={name}
                       className={`size-[92px] rounded-full bg-ink object-cover shadow-[0px_4px_32px_rgba(62,39,51,0.04)] ${
                         isSelected

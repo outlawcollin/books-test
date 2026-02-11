@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { BookData, ChatSession, StoryInputMode, RewriteData } from "@/lib/types";
 import { BOOK_CHAT_MESSAGES } from "@/lib/mock-chat";
 import { BOOK_REWRITES } from "@/lib/rewrites";
+import { getCharacterAvatar } from "@/lib/character-avatars";
 import CharacterPicker from "./CharacterPicker";
 import SelectionCard from "./SelectionCard";
 import PersonaModal, { type Persona } from "./PersonaModal";
@@ -28,7 +29,15 @@ function findCharacterIndex(characters: string[], name?: string): number | null 
 }
 
 export default function BuildWorldTab({ book, onStartChat, initialRewrite, onClearRewrite }: BuildWorldTabProps) {
-  const suggestions = BOOK_REWRITES[book.id] ?? [];
+  const GENERIC_SUGGESTIONS = [
+    "Happy Ending", "Everyone's A Robot", "Set In Space", "Modern Day Retelling",
+    "Villain Wins", "Told In Reverse", "It Was All A Dream", "Musical Version",
+    "Nobody Dies", "Zombie Apocalypse",
+  ];
+  const bookSuggestions = BOOK_REWRITES[book.id] ?? [];
+  const suggestions = bookSuggestions.length >= 10
+    ? bookSuggestions
+    : [...bookSuggestions, ...GENERIC_SUGGESTIONS.filter((g) => !bookSuggestions.includes(g))].slice(0, 10);
   const characters = book.characters?.length
     ? book.characters
     : ["Protagonist", "Narrator", "Companion", "Rival", "Mentor"];
@@ -76,16 +85,15 @@ export default function BuildWorldTab({ book, onStartChat, initialRewrite, onCle
       <div className="flex flex-1 flex-col gap-4">
         <div className="flex flex-col gap-1">
           <p className="font-serif text-base leading-[1.5] text-ink opacity-80">
-            How will you rewrite this story?
+            Let&apos;s leave your mark on this story
           </p>
           <p className="font-serif text-sm leading-[1.5] text-ink opacity-60">
-            Leave your mark.
+            How would you change it?
           </p>
         </div>
 
         {/* Textarea card */}
-        <div className="flex flex-1 flex-col justify-between rounded-[20px] border border-[rgba(62,39,51,0.12)] bg-white/60 p-5">
-          {/* Cover card + textarea row (desktop: side-by-side, mobile: stacked) */}
+        <div className="flex flex-1 flex-col rounded-[20px] border border-[rgba(62,39,51,0.12)] bg-white/60 p-5">
           <div className="flex flex-1 flex-col gap-4">
             {/* Mini rewrite cover card */}
             {activeRewrite && coverSrc && (
@@ -114,43 +122,42 @@ export default function BuildWorldTab({ book, onStartChat, initialRewrite, onCle
               onChange={(e) => setPremiseText(e.target.value)}
               placeholder="Happy ending? Everyone's a robot?... Up to you."
               className="flex-1 resize-none bg-transparent font-serif text-base leading-[1.3] text-ink outline-none placeholder:text-ink/60"
-              rows={4}
+              rows={6}
             />
           </div>
+        </div>
 
-          <div className="flex flex-col gap-3 pt-4">
-            <p className="font-serif text-sm leading-[1.5] text-ink opacity-60">
-              Quick select:
-            </p>
-            <div
-              className="relative"
-              style={{ maskImage: "linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent)" }}
-            >
-              <div className="flex gap-1.5 flex-nowrap overflow-x-auto scrollbar-hide">
-                {suggestions.map((label, i) => {
-                  const isSelected = selectedPill === i;
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => setSelectedPill(isSelected ? null : i)}
-                      style={{ transition: "background-color 200ms ease-out, color 200ms ease-out" }}
-                      className={`flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full pl-6 pr-2 py-2 font-serif text-sm leading-[20px] ${
-                        isSelected
-                          ? "bg-[#6b2e63] text-white"
-                          : "bg-espresso/[0.06] text-espresso"
-                      }`}
-                    >
-                      {label}
-                      <span className={`inline-flex overflow-hidden transition-all duration-200 ease-out will-change-[transform,opacity,width] ${
-                        isSelected ? "w-5 opacity-100 scale-100" : "w-0 opacity-0 scale-50"
-                      }`}>
-                        {closePillIcon}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+        {/* Quick select — standalone outside the card */}
+        <div className="flex flex-col gap-3">
+          <p className="font-serif text-sm leading-[1.5] text-ink opacity-60">
+            Or quick select:
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+              {suggestions.slice(0, 10).map((label, i) => {
+                const isSelected = selectedPill === i;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedPill(isSelected ? null : i)}
+                    style={isSelected
+                      ? { transition: "background-color 200ms ease-out, color 200ms ease-out" }
+                      : { background: "linear-gradient(110deg, #652e1f 30%, #8a4a38 50%, #652e1f 70%)", backgroundSize: "200% 100%", animation: "shimmer-pill 8.4s linear infinite" }
+                    }
+                    className={`flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full pl-6 pr-2 py-2 font-serif text-sm leading-[20px] ${
+                      isSelected
+                        ? "bg-[#6b2e63] text-white"
+                        : "text-white"
+                    }${i >= 6 ? " max-md:hidden" : ""}`}
+                  >
+                    {label}
+                    <span className={`inline-flex overflow-hidden transition-all duration-200 ease-out will-change-[transform,opacity,width] ${
+                      isSelected ? "w-5 opacity-100 scale-100" : "w-0 opacity-0 scale-50"
+                    }`}>
+                      {closePillIcon}
+                    </span>
+                  </button>
+                );
+              })}
           </div>
         </div>
       </div>
@@ -207,7 +214,7 @@ export default function BuildWorldTab({ book, onStartChat, initialRewrite, onCle
               ? selectedPersona.name
               : characters[selectedCharacter!];
             const characterAvatar = selectedPersona?.avatar
-              ?? `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(characterName)}&size=184`;
+              ?? getCharacterAvatar(characterName);
             onStartChat({
               bookId: book.id,
               characterName,

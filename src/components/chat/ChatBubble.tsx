@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChatMessage } from "@/lib/types";
+import { getCharacterAvatar } from "@/lib/character-avatars";
 import SuggestionPills from "./SuggestionPills";
 import ChoiceCards from "./ChoiceCards";
 
@@ -48,7 +49,7 @@ export default function ChatBubble({ message, storyInput, playerAvatar }: ChatBu
 
   // NPC
   const npcAvatar = message.characterName
-    ? `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(message.characterName)}&size=184`
+    ? getCharacterAvatar(message.characterName)
     : undefined;
 
   return (
