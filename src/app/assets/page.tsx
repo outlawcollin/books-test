@@ -26,8 +26,8 @@ export default async function AssetsPage() {
         fontFamily: "system-ui, sans-serif",
         padding: 48,
         background: "#f4f0e9",
-        minHeight: "100vh",
-        overflow: "auto",
+        height: "100dvh",
+        overflowY: "auto",
       }}
     >
       <h1 style={{ fontSize: 32, color: "#3e2733", marginBottom: 8 }}>
